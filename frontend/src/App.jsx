@@ -8,6 +8,7 @@ import { MovieDetailsPage } from './pages/MovieDetailsPage';
 import { PhotosPage } from './pages/PhotosPage';
 import { VideosCutsPage } from './pages/VideosCutsPage';
 import { VideosPage } from './pages/VideosPage';
+import { BiographyPage } from './pages/BiographyPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/photos" element={<PhotosPage />} />
             <Route path="/video-cuts" element={<VideosCutsPage />} />
             <Route path="/videos" element={<VideosPage />} />
+            <Route path="/biography" element={<BiographyPage />} />
             
             {/* 404 Page */}
             <Route

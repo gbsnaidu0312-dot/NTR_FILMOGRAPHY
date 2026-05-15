@@ -284,7 +284,7 @@ MOVIES = [
         'r2_folder': 'Jai Lava Kusa',  # Audio, Photos/Movie, Movie Cuts
     },
     {
-        'title': 'Aravinda Sametha',
+        'title': 'Aravindha Sametha',
         'release_year': 2018,
         'description': 'A powerful action drama about caste-based violence in Rayalaseema. Jr. NTR plays a young man who breaks the cycle of vengeance.',
         'genre': 'Action, Drama',
@@ -356,7 +356,7 @@ def get_r2_folder_for_movie(movie_title):
         'Student No. 1': 'Student No1',
         'Yamadonga': 'YamaDonga',
         'Ramayya Vasthavayya': 'Ramayya Vastavayya',
-        'Aravinda Sametha': 'Aravinda Sametha',
+        'Aravindha Sametha': 'Aravinda Sametha',
     }
     return special_cases.get(movie_title, movie_title)
 

@@ -14,6 +14,7 @@ export const Navigation = () => {
   const navItems = [
     { label: 'HOME', path: '/' },
     { label: 'MOVIES', path: '/movies' },
+    { label: 'BIOGRAPHY', path: '/biography' },
     { label: 'PHOTOS', path: '/photos' },
     { label: 'VIDEO CUTS', path: '/video-cuts' },
     { label: 'VIDEOS', path: '/videos' },
