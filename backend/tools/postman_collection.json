@@ -1,0 +1,332 @@
+{
+  "info": {
+    "name": "NTR Filmography API",
+    "description": "API endpoints for NTR Filmography - Jr. NTR Fan Site",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Movies",
+      "item": [
+        {
+          "name": "Get All Movies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/movies/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "movies", ""]
+            },
+            "description": "Retrieve all movies with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movie Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/movies/rrr/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "movies", "rrr", ""]
+            },
+            "description": "Get details of a specific movie by slug"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movie Video Cuts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/movies/rrr/video-cuts/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "movies", "rrr", "video-cuts", ""]
+            },
+            "description": "Get all video cuts for a specific movie"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movie Video Songs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/movies/rrr/video-songs/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "movies", "rrr", "video-songs", ""]
+            },
+            "description": "Get all video songs for a specific movie"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movie Audio Songs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/movies/rrr/audio-songs/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "movies", "rrr", "audio-songs", ""]
+            },
+            "description": "Get all audio songs for a specific movie"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Videos",
+      "item": [
+        {
+          "name": "Get All Videos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/videos/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "videos", ""]
+            },
+            "description": "Get all videos with optional type filter"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Videos by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/videos/?type=cut",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "videos", ""],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "cut"
+                }
+              ]
+            },
+            "description": "Get videos filtered by type (cut, song, event, celebration, ads)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Events Videos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/videos/?type=event",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "videos", ""],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "event"
+                }
+              ]
+            },
+            "description": "Get event videos"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Celebrations Videos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/videos/?type=celebration",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "videos", ""],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "celebration"
+                }
+              ]
+            },
+            "description": "Get celebration videos"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audio Songs",
+      "item": [
+        {
+          "name": "Get All Audio Songs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/audio-songs/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "audio-songs", ""]
+            },
+            "description": "Get all audio songs"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audio Song Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/audio-songs/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "audio-songs", "1", ""]
+            },
+            "description": "Get details of a specific audio song by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Photos",
+      "item": [
+        {
+          "name": "Get Photo Folders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/folders/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", "folders", ""]
+            },
+            "description": "Get all photo folders"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Folders by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/folders/?type=movie",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", "folders", ""],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "movie"
+                }
+              ]
+            },
+            "description": "Get photo folders filtered by type (movie, event, offline)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Folder Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/folders/aadi/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", "folders", "aadi", ""]
+            },
+            "description": "Get details of a specific folder including photos"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Folder Subfolders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/folders/events/subfolders/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", "folders", "events", "subfolders", ""]
+            },
+            "description": "Get subfolders of a specific folder"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Photos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", ""]
+            },
+            "description": "Get all photos with optional folder filter"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Photos by Folder",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/photos/?folder=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "photos", ""],
+              "query": [
+                {
+                  "key": "folder",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get photos from a specific folder by folder ID"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
