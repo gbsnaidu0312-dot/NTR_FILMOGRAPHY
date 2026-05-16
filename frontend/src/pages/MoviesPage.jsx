@@ -5,6 +5,7 @@ import { moviesApi } from '../services/api';
 import { formatDuration } from '../utils/helpers';
 import { LoadingSpinner, ErrorBoundary } from '../components/Common';
 import { getR2Url } from '../config/links';
+import { getLandscapeBanner, getPortraitBanner } from '../utils/banners';
 
 export const MoviesPage = () => {
   const navigate = useNavigate();
@@ -188,7 +189,7 @@ export const MoviesPage = () => {
                 }}
               >
                 <img
-                  src={movie.poster_url || getR2Url('/wp5283563.jpg')}
+                  src={getPortraitBanner(movie.title, movie.poster_url || getR2Url('/wp5283563.jpg'))}
                   alt={movie.title}
                   className="w-full h-full object-cover"
                 />
@@ -324,7 +325,7 @@ export const MoviesPage = () => {
                 <div className="absolute md:relative right-0 top-0 bottom-0 w-full md:w-1/2">
                   <div
                     className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${selectedMovie.banner_url || getR2Url('/wp5283563.jpg')})` }}
+                    style={{ backgroundImage: `url('${getLandscapeBanner(selectedMovie.title)}')` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-dark via-dark/60 to-transparent md:via-dark/30" />
                   <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent" />
@@ -384,7 +385,7 @@ export const MoviesPage = () => {
                         {/* Song Thumbnail */}
                         <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden flex-shrink-0">
                           <img
-                            src={selectedMovie?.poster_url || getR2Url('/wp5283563.jpg')}
+                            src={getPortraitBanner(selectedMovie?.title, selectedMovie?.poster_url || getR2Url('/wp5283563.jpg'))}
                             alt={song.title}
                             className="w-full h-full object-cover"
                           />
@@ -445,7 +446,7 @@ export const MoviesPage = () => {
                         <div className="flex items-center gap-3 w-[180px] md:w-[240px] flex-shrink-0">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden">
                             <img
-                              src={selectedMovie?.poster_url || getR2Url('/wp5283563.jpg')}
+                              src={getPortraitBanner(selectedMovie?.title, selectedMovie?.poster_url || getR2Url('/wp5283563.jpg'))}
                               alt={currentSong.title}
                               className="w-full h-full object-cover"
                             />

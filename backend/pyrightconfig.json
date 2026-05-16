@@ -1,0 +1,18 @@
+{
+  "include": [
+    "apps",
+    "config",
+    "scripts"
+  ],
+  "extraPaths": [
+    "."
+  ],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": "none",
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none",
+  "useLibraryCodeForTypes": true,
+  "venvPath": ".",
+  "venv": "venv"
+}

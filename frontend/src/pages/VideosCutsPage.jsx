@@ -64,9 +64,9 @@ const HeartIcon = ({ filled }) => (
 
 export const VideosCutsPage = () => {
   const navigate = useNavigate();
-  const [movies, setMovies] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState(null);
   const [activeType, setActiveType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,52 +74,58 @@ export const VideosCutsPage = () => {
   const [gridView, setGridView] = useState('medium'); // 'large', 'medium', 'compact'
   const [likedVideos, setLikedVideos] = useState(new Set());
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
+  const [allVideos, setAllVideos] = useState([]);
 
-  const fetchMovies = async () => {
+  useEffect(() => {
+    if (activeType) {
+      fetchAndBuildFolders();
+    } else {
+      setFolders([]);
+      setAllVideos([]);
+      setLoading(false);
+    }
+  }, [activeType]);
+
+  const fetchAndBuildFolders = async () => {
     try {
       setLoading(true);
-      const response = await moviesApi.getAll();
-      if (response.data.results && response.data.results.length > 0) {
-        setMovies(response.data.results);
-      }
+      const type = activeType === 'video-songs' ? 'song' : 'cut';
+      const response = await videosApi.getByType(type);
+      const results = response.data.results || response.data || [];
+      setAllVideos(results);
+
+      // Extract unique folder names from video data
+      const seen = new Set();
+      const folderList = [];
+      results.forEach(video => {
+        const name = video.folder_name || (video.movie ? video.movie.title : 'General');
+        if (!seen.has(name)) {
+          seen.add(name);
+          const count = results.filter(v => (v.folder_name || (v.movie ? v.movie.title : 'General')) === name).length;
+          folderList.push({ id: folderList.length + 1, name, count });
+        }
+      });
+      setFolders(folderList);
       setError(null);
     } catch (err) {
-      console.error('Error fetching movies:', err);
-      setError(null);
+      console.error('Error fetching folders:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchVideosForMovie = async (movie, type) => {
-    // Map category IDs to backend video_type values
-    const apiType = type === 'video-songs' ? 'song' : type === 'movie-cuts' ? 'cut' : type;
-    try {
-      setLoading(true);
-      const response = await videosApi.getByType(apiType);
-      if (response.data.results && response.data.results.length > 0) {
-        setVideos(response.data.results);
-      }
-      setSelectedMovie(movie);
-      setSelectedVideoIndex(null);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching videos:', err);
-      setSelectedMovie(movie);
-      setSelectedVideoIndex(null);
-    } finally {
-      setLoading(false);
-    }
+  const fetchVideosForFolder = (folder) => {
+    const filtered = allVideos.filter(v => (v.folder_name || (v.movie ? v.movie.title : 'General')) === folder.name);
+    setVideos(filtered);
+    setSelectedFolder(folder);
+    setSelectedVideoIndex(null);
   };
 
   const handleBack = () => {
     if (selectedVideoIndex !== null) {
       setSelectedVideoIndex(null);
-    } else if (selectedMovie) {
-      setSelectedMovie(null);
+    } else if (selectedFolder) {
+      setSelectedFolder(null);
       setVideos([]);
     } else if (activeType) {
       setActiveType(null);
@@ -255,9 +261,9 @@ export const VideosCutsPage = () => {
     </motion.button>
   );
 
-  if (loading && movies.length === 0) return <LoadingSpinner />;
-  if (error && movies.length === 0) {
-    return <ErrorBoundary message={error} onRetry={fetchMovies} />;
+  if (loading && !activeType) return <LoadingSpinner />;
+  if (error && folders.length === 0) {
+    return <ErrorBoundary message={error} onRetry={() => window.location.reload()} />;
   }
 
   return (
@@ -289,7 +295,7 @@ export const VideosCutsPage = () => {
           </motion.button>
 
           {/* Grid View Toggle - only show when video grid is visible */}
-          {selectedMovie && videos.length > 0 && selectedVideoIndex === null && (
+          {selectedFolder && videos.length > 0 && selectedVideoIndex === null && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -320,7 +326,7 @@ export const VideosCutsPage = () => {
           )}
 
           {/* Search icon when no grid view */}
-          {!selectedMovie && (
+          {!selectedFolder && (
             <motion.button
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -347,7 +353,7 @@ export const VideosCutsPage = () => {
               <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400 text-sm">
-                    {selectedMovie?.title} — {categories.find((c) => c.id === activeType)?.title}
+                    {selectedFolder?.name} — {categories.find((c) => c.id === activeType)?.title}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
@@ -576,8 +582,8 @@ export const VideosCutsPage = () => {
                 </div>
               </motion.div>
             </motion.div>
-          ) : !selectedMovie ? (
-            /* Movie Folders Grid */
+          ) : !selectedFolder ? (
+            /* Folder Grid */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -590,17 +596,17 @@ export const VideosCutsPage = () => {
                 {categories.find((c) => c.id === activeType)?.title}
               </h2>
 
-              {movies.length > 0 ? (
+              {folders.length > 0 ? (
                 <motion.div
                   className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ staggerChildren: 0.05 }}
                 >
-                  {movies.map((movie, i) => (
+                  {folders.map((folder, i) => (
                     <motion.button
-                      key={movie.id}
-                      onClick={() => fetchVideosForMovie(movie, activeType)}
+                      key={folder.id}
+                      onClick={() => fetchVideosForFolder(folder)}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.03 }}
@@ -609,25 +615,25 @@ export const VideosCutsPage = () => {
                     >
                       <div className="relative rounded-lg overflow-hidden mb-3 aspect-[3/4]">
                         <img
-                          src={movie.poster_url}
-                          alt={movie.title}
+                          src={getR2Url('/wp5283563.jpg')}
+                          alt={folder.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all" />
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-white font-bold text-lg text-center px-2">{movie.title}</span>
-                          <span className="text-gray-300 text-xs mt-1">{movie.release_year}</span>
+                          <span className="text-white font-bold text-lg text-center px-2">{folder.name}</span>
+                          <span className="text-gray-300 text-xs mt-1">{folder.count} videos</span>
                         </div>
                       </div>
                     </motion.button>
                   ))}
                 </motion.div>
               ) : (
-                <EmptyState title="No Movies Found" description="No movies available yet" />
+                <EmptyState title="No Folders Found" description={`No ${activeType} folders available yet`} />
               )}
             </motion.div>
           ) : (
-            /* Video Grid for Selected Movie */
+            /* Video Grid for Selected Folder */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -638,7 +644,7 @@ export const VideosCutsPage = () => {
                   className="text-gold text-xl md:text-2xl font-bold"
                   style={{ fontFamily: "'Cinzel', serif" }}
                 >
-                  {selectedMovie.title} — {categories.find((c) => c.id === activeType)?.title}
+                  {selectedFolder.name} — {categories.find((c) => c.id === activeType)?.title}
                 </h2>
                 <span className="text-gray-400 text-sm">{videos.length} videos</span>
               </div>

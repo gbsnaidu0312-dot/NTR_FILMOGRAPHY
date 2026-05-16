@@ -1,0 +1,41 @@
+{
+  // ── Python ──────────────────────────────────────────────────────────────────
+  // Tell Pylance that the Django project root is backend/, so that
+  // "import apps.photos.models" resolves without errors.
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend"
+  ],
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/backend"
+  ],
+
+  // Point to the venv interpreter inside backend/
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/Scripts/python.exe",
+
+  // ── Django ──────────────────────────────────────────────────────────────────
+  "python.envFile": "${workspaceFolder}/backend/.env",
+
+  // ── Pylance / Pyright ───────────────────────────────────────────────────────
+  "python.analysis.typeCheckingMode": "basic",
+  "python.languageServer": "Pylance",
+
+  // Suppress "cannot find module" for Django internal imports that are
+  // resolved at runtime via DJANGO_SETTINGS_MODULE, and dynamic attributes like .objects.
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingModuleSource": "none",
+    "reportAttributeAccessIssue": "none",
+    "reportMissingTypeStubs": "none"
+  },
+
+  // ── Editor ──────────────────────────────────────────────────────────────────
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true
+  }
+}

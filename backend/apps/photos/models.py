@@ -1,7 +1,7 @@
 """
 Photos App - Models for photo galleries
 """
-from django.db import models
+from django.db import models  # type: ignore
 from apps.core.models import TimestampedModel
 from apps.movies.models import Movie
 
@@ -22,6 +22,8 @@ class PhotoFolder(TimestampedModel):
     description = models.TextField(blank=True)
     parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subfolders', null=True, blank=True)
 
+    objects = models.Manager()
+
     class Meta:
         ordering = ['name']
         unique_together = ('path', 'folder_type')
@@ -31,12 +33,12 @@ class PhotoFolder(TimestampedModel):
         ]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            from django.utils.text import slugify
-            self.slug = slugify(self.name)
+            from django.utils.text import slugify  # type: ignore
+            self.slug = str(slugify(str(self.name)))  # type: ignore
         super().save(*args, **kwargs)
 
 
@@ -50,6 +52,8 @@ class Photo(TimestampedModel):
     caption = models.CharField(max_length=255, blank=True)
     order = models.IntegerField(default=0)
 
+    objects = models.Manager()
+
     class Meta:
         ordering = ['order', '-created_at']
         indexes = [
@@ -58,4 +62,4 @@ class Photo(TimestampedModel):
         ]
 
     def __str__(self):
-        return f"Photo - {self.folder.name}"
+        return f"Photo - {str(self.folder.name)}"
