@@ -17,23 +17,37 @@ import { videosApi } from '../services/api';
 import { getR2Url } from '../config/links';
 import { LoadingSpinner, EmptyState } from '../components/Common';
 
-const FolderCard = ({ folder, onClick, index }) => (
-  <motion.button
-    onClick={onClick}
-    initial={{ opacity: 0, scale: 0.82 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay: index * 0.04, duration: 0.35 }}
-    whileHover={{ scale: 1.05, y: -5 }}
-    whileTap={{ scale: 0.97 }}
-    className="group text-left focus:outline-none"
-  >
-    <div className="relative rounded-xl overflow-hidden shadow-lg shadow-black/50 aspect-[3/4]">
-      <img
-        src={folder.thumbnail_url || getR2Url('/wp5283563.jpg')}
-        alt={folder.name}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        onError={(e) => { e.target.src = getR2Url('/wp5283563.jpg'); }}
-      />
+const FolderCard = ({ folder, onClick, index }) => {
+  const [imgError, setImgError] = React.useState(false);
+  const showPlaceholder = imgError || !folder.thumbnail_url || folder.thumbnail_url === 'null';
+
+  return (
+    <motion.button
+      onClick={onClick}
+      initial={{ opacity: 0, scale: 0.82 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.04, duration: 0.35 }}
+      whileHover={{ scale: 1.05, y: -5 }}
+      whileTap={{ scale: 0.97 }}
+      className="group text-left focus:outline-none"
+    >
+      <div className="relative rounded-xl overflow-hidden shadow-lg shadow-black/50 aspect-[3/4] border border-blue-500/20 group-hover:border-blue-400/50 transition-colors">
+        {!showPlaceholder ? (
+          <img
+            src={folder.thumbnail_url}
+            alt={folder.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1e3a8a]/20 to-black/80">
+            <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform duration-500">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.4-2.2 1.5-2.5l13.5-4c1.1-.3 2.2.4 2.5 1.5l.1.3z"/><path d="m2.6 10.6 17.5 5.8c.8.3 1.2 1.1 1 1.9l-1.3 3.8c-.3.8-1.1 1.2-1.9 1l-17.5-5.8c-.8-.3-1.2-1.1-1-1.9l1.3-3.8c.3-.8 1.1-1.2 1.9-1z"/><path d="m20.8 15.5-2.7-.9"/><path d="m16.8 14.1-2.7-.9"/><path d="m12.9 12.8-2.7-.9"/><path d="m9 11.5-2.7-.9"/>
+              </svg>
+            </div>
+          </div>
+        )}
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent group-hover:from-black/90 transition-all duration-300" />
       {/* Text */}
@@ -58,7 +72,8 @@ const FolderCard = ({ folder, onClick, index }) => (
       </div>
     </div>
   </motion.button>
-);
+  );
+};
 
 export const VideoFoldersListPage = ({ videoType, title, subtitle, backPath, folderBasePath }) => {
   const navigate = useNavigate();

@@ -13,7 +13,7 @@ export const BiographyPage = () => {
     const fetchBioData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/bio.json');
+        const response = await fetch('/bio.json', { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to load biography data');
         const data = await response.json();
         setBioData(data);
@@ -79,12 +79,12 @@ export const BiographyPage = () => {
       </div>
 
       {/* Biography Grid */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 flex justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl items-stretch"
         >
           {bioData?.slides?.map((slide, index) => (
             <BiographyCard

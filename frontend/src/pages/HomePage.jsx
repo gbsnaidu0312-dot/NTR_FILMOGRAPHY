@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HeroSection } from '../components/HeroSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getR2Url } from '../config/links';
 
 const CARD_CLASSES = [
   'bio-card-gold',
@@ -13,10 +12,12 @@ const CARD_CLASSES = [
 ];
 
 // Helper function to transform bio.json slides to card format
+const FALLBACK_IMAGE = 'https://ntrfilmography.live/sample/79.jpg';
 const transformBioSlides = (slides) => {
   return slides.map((slide, index) => ({
     id: slide.slide,
-    image: getR2Url('/wp5283563.jpg'),
+    image: slide.banner_url || FALLBACK_IMAGE,
+    orientation: slide.orientation || 'landscape',
     date: slide.date_year,
     title: slide.heading,
     description: slide.short_description,
@@ -35,7 +36,7 @@ const BioCard = ({ event, onClick }) => (
       <img
         src={event.image}
         alt={event.title}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-top"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/60" />
     </div>
@@ -90,7 +91,7 @@ export const HomePage = () => {
     const fetchBioData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/bio.json');
+        const response = await fetch('/bio.json', { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to load bio.json');
         const data = await response.json();
         const transformedEvents = transformBioSlides(data.slides);

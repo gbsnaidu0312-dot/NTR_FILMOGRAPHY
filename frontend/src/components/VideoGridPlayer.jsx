@@ -28,24 +28,68 @@ const HeartIcon = ({ filled }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
 );
 
+// ─── Hover Video Player ────────────────────────────────────────────────────────
+const HoverVideoPlayer = ({ videoSrc, posterSrc, durationSeconds, isHovered }) => {
+  const videoRef = React.useRef(null);
+  const isMp4 = videoSrc && videoSrc.toLowerCase().endsWith('.mp4');
+
+  React.useEffect(() => {
+    if (isMp4 && videoRef.current) {
+      if (isHovered) {
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isHovered, isMp4]);
+
+  const startTime = durationSeconds ? Math.min(Math.floor(durationSeconds * 0.2), 10) : 10;
+
+  if (!isMp4) {
+    return (
+      <img
+        src={posterSrc || getR2Url('/wp5283563.jpg')}
+        alt="thumbnail"
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        onError={(e) => { e.target.src = getR2Url('/wp5283563.jpg'); }}
+      />
+    );
+  }
+
+  return (
+    <video
+      ref={videoRef}
+      src={`${videoSrc}#t=${startTime}`}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+    />
+  );
+};
+
 // ─── Video Card ───────────────────────────────────────────────────────────────
 const VideoCard = ({ video, index, gridView, onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const aspectClass = gridView === 'large' ? 'aspect-video' : 'aspect-video';
   return (
     <motion.button
       onClick={() => onClick(index)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
       whileHover={{ scale: 1.03 }}
       className="group text-left"
     >
-      <div className={`relative rounded-xl overflow-hidden ${aspectClass} shadow-md shadow-black/40`}>
-        <img
-          src={video.thumbnail_url || getR2Url('/wp5283563.jpg')}
-          alt={video.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          onError={(e) => { e.target.src = getR2Url('/wp5283563.jpg'); }}
+      <div className={`relative rounded-xl overflow-hidden ${aspectClass} shadow-md shadow-black/40 border border-blue-500/20 group-hover:border-blue-400/50 transition-colors`}>
+        <HoverVideoPlayer 
+          videoSrc={video.video_url} 
+          posterSrc={video.thumbnail_url} 
+          durationSeconds={video.duration_seconds} 
+          isHovered={isHovered}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent group-hover:from-black/85 transition-all duration-300" />
         {/* Play button */}

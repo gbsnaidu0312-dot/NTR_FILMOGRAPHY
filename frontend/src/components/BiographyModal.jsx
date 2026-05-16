@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 const PLACEHOLDER_IMAGE = 'https://ntrfilmography.live/sample/79.jpg';
 
 export const BiographyModal = ({ slide, onClose }) => {
-  const imageUrl = slide.photo_related ? PLACEHOLDER_IMAGE : PLACEHOLDER_IMAGE;
+  const imageUrl = slide.banner_url || PLACEHOLDER_IMAGE;
+  const isPortrait = slide.orientation === 'portrait';
 
   return (
     <motion.div
@@ -21,14 +22,15 @@ export const BiographyModal = ({ slide, onClose }) => {
         onClick={(e) => e.stopPropagation()}
         className="bg-dark-lighter rounded-lg overflow-hidden max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gold/30 shadow-2xl"
       >
-        {/* Image */}
-        <div className="relative h-72 md:h-96 overflow-hidden bg-dark">
+        {/* Image - Full image displayed without cropping */}
+        <div className="relative bg-dark flex items-center justify-center" style={{ minHeight: '280px', maxHeight: '70vh' }}>
           <img
             src={imageUrl}
             alt={slide.heading}
-            className="w-full h-full object-cover"
+            className="w-full max-h-[70vh] object-contain"
+            style={{ display: 'block' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-dark-lighter via-transparent to-transparent"></div>
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-dark-lighter to-transparent pointer-events-none" />
 
           {/* Close Button */}
           <button

@@ -165,7 +165,7 @@ export function getLandscapeBanner(title, fallback = null) {
   const key = (title || '').toLowerCase().trim();
   const entry = BANNER_MAP[key];
   if (entry && entry.landscape) return entry.landscape;
-  return fallback;
+  return '/tiger-nation-logo-landscape.jpg';
 }
 
 /**
@@ -179,5 +179,6 @@ export function getPortraitBanner(title, fallback = null) {
   const key = (title || '').toLowerCase().trim();
   const entry = BANNER_MAP[key];
   if (entry && entry.portrait) return entry.portrait;
-  return fallback;
+  return '/tiger-nation-logo-portrait.jpg';
 }
+

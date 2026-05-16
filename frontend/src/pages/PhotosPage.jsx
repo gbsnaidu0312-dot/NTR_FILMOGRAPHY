@@ -62,6 +62,50 @@ const HeartIcon = ({ filled }) => (
   </svg>
 );
 
+const PhotoFolderCard = ({ folder, index, onClick }) => {
+  const [imgError, setImgError] = React.useState(false);
+  const showPlaceholder = imgError || !folder.thumbnail_url || folder.thumbnail_url === 'null';
+
+  return (
+    <motion.button
+      onClick={() => onClick(folder)}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ scale: 1.05 }}
+      className="text-left group"
+    >
+      <div className="relative rounded-lg overflow-hidden mb-3 aspect-square border border-blue-500/20 group-hover:border-blue-400/50 transition-colors">
+        {!showPlaceholder ? (
+          <img
+            src={folder.thumbnail_url}
+            alt={folder.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1e3a8a]/20 to-black/80">
+            <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform duration-500">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-white font-bold text-lg">{folder.photo_count}</span>
+          <span className="text-gray-300 text-xs">photos</span>
+        </div>
+      </div>
+      <h3 className="font-bold text-gold group-hover:text-golden transition-colors text-sm md:text-base">
+        {folder.name}
+      </h3>
+      <p className="text-xs text-gray-400">{folder.description}</p>
+    </motion.button>
+  );
+};
+
 export const PhotosPage = () => {
   const navigate = useNavigate();
   const [folders, setFolders] = useState([]);
@@ -583,32 +627,12 @@ export const PhotosPage = () => {
                     transition={{ staggerChildren: 0.08 }}
                   >
                     {folders.map((folder, i) => (
-                      <motion.button
+                      <PhotoFolderCard
                         key={i}
-                        onClick={() => handleFolderClick(folder)}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        whileHover={{ scale: 1.05 }}
-                        className="text-left group"
-                      >
-                        <div className="relative rounded-lg overflow-hidden mb-3 aspect-square">
-                          <img
-                            src={getR2Url('/wp5283563.jpg')}
-                            alt={folder.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all" />
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-white font-bold text-lg">{folder.photo_count}</span>
-                            <span className="text-gray-300 text-xs">photos</span>
-                          </div>
-                        </div>
-                        <h3 className="font-bold text-gold group-hover:text-golden transition-colors text-sm md:text-base">
-                          {folder.name}
-                        </h3>
-                        <p className="text-xs text-gray-400">{folder.description}</p>
-                      </motion.button>
+                        index={i}
+                        folder={folder}
+                        onClick={handleFolderClick}
+                      />
                     ))}
                   </motion.div>
                 ) : (

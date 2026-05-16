@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 const PLACEHOLDER_IMAGE = 'https://ntrfilmography.live/sample/79.jpg';
 
 export const BiographyCard = ({ slide, index, onClick }) => {
-  const imageUrl = slide.photo_related ? PLACEHOLDER_IMAGE : PLACEHOLDER_IMAGE;
+  const imageUrl = slide.banner_url || PLACEHOLDER_IMAGE;
+  const isPortrait = slide.orientation === 'portrait';
 
   return (
     <motion.div
@@ -20,7 +21,7 @@ export const BiographyCard = ({ slide, index, onClick }) => {
           <img
             src={imageUrl}
             alt={slide.heading}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover object-top transition-transform duration-300"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
         </div>
