@@ -336,6 +336,8 @@ MOVIE_PHOTO_FOLDER_MAP = {
     'Yamadonga': 'YamaDonga',
     'Student No. 1': 'Student No1',
     'Ramayya Vasthavayya': 'Ramayya Vastavayya',
+    'Janatha Garage': 'JANTHA GARAGE',
+    'Nannaku Prematho': 'NANNAKU PREMATHO',
 }
 
 # Map movie titles to VideoCuts/Video Songs folder names (trailing underscores)
@@ -347,7 +349,12 @@ VIDEO_SONG_FOLDER_MAP = {
 # Map movie titles to VideoCuts/Movie Cuts folder names (trailing underscores)
 MOVIE_CUT_FOLDER_MAP = {
     'Aadi': 'Aadi_',
+    'Janatha Garage': 'JANTHA GARAGE',
+    'Nannaku Prematho': 'NANNAKU PREMATHO',
+    'Student No. 1': 'Student No1',
+    'War2': 'WAR2',
 }
+
 
 
 def get_r2_folder_for_movie(movie_title):

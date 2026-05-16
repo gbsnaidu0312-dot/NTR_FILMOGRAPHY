@@ -28,6 +28,8 @@ class Video(TimestampedModel):
     views = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
+    objects = models.Manager()
+
     class Meta:
         ordering = ['-created_at']
         indexes = [

@@ -20,4 +20,4 @@ class VideoListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for video listings"""
     class Meta:
         model = Video
-        fields = ['id', 'title', 'video_type', 'thumbnail_url', 'duration_seconds', 'views']
+        fields = ['id', 'title', 'video_type', 'video_url', 'thumbnail_url', 'duration_seconds', 'views']

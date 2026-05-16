@@ -67,12 +67,15 @@ export const ErrorBoundary = ({ message, onRetry }) => (
 
 export const VideoPlayer = ({ url, thumbnail }) => (
   <div className="relative w-full bg-black rounded-lg overflow-hidden aspect-video">
-    <iframe
-      src={url}
-      title="Video Player"
-      allowFullScreen
+    <video
+      controls
+      controlsList="nodownload"
+      poster={thumbnail}
       className="w-full h-full"
-    />
+    >
+      <source src={url} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
   </div>
 );
 

@@ -1,182 +1,183 @@
 /**
  * Banner mapping for NTR Filmography.
- * Maps movie title (lowercase) to landscape (L) and portrait (P) banner paths.
+ * Maps movie title (or slug key) to landscape (L) and portrait (P) banner paths.
  *
- * IMPORTANT: All paths use %20 for spaces so CSS url() works correctly without quoting.
+ * Folder naming convention in /public/banners/:
+ *   <FolderName>/<FolderName> L.<ext>   — landscape banner (hero background)
+ *   <FolderName>/<FolderName> P.<ext>   — portrait banner  (sidebar thumbnail)
  *
- * Fallback when no local banner exists: Tiger Nation logo.
+ * Some movies use abbreviations (ASVR, JLK, JNG, NKP, RMV).
+ * Some portrait files have lowercase "p" — all paths are handled here.
  */
 
-/** Tiger Nation logo — used as fallback when a banner is missing */
-export const TIGER_LOGO = '/tiger-nation-logo.jpg';
-
 const BANNER_MAP = {
+  // title (lowercase, trimmed) → { landscape, portrait }
 
-  // Adhurs / Aadhurs (2010)
+  // Adhurs / Aadhurs
   'adhurs': {
-    landscape: '/banners/Aadhurs/Aadhurs%20L.png',
-    portrait:  '/banners/Aadhurs/Aadhurs%20P.jpg',
+    landscape: '/banners/Aadhurs/Aadhurs L.png',
+    portrait: '/banners/Aadhurs/Aadhurs P.jpg',
   },
 
-  // Aadi (2002)
+  // Aadi
   'aadi': {
-    landscape: '/banners/Aadi/Aadi%20L.png',
-    portrait:  '/banners/Aadi/Aadi%20P.png',
+    landscape: '/banners/Aadi/Aadi L.png',
+    portrait: '/banners/Aadi/Aadi P.png',
   },
 
-  // Allari Ramudu (2002)
+  // Allari Ramudu
   'allari ramudu': {
-    landscape: '/banners/Allari%20Ramudu/Allari%20Ramudu%20L.png',
-    portrait:  '/banners/Allari%20Ramudu/Allari%20Ramudu%20P.jpg',
+    landscape: '/banners/Allari Ramudu/Allari Ramudu L.png',
+    portrait: '/banners/Allari Ramudu/Allari Ramudu P.jpg',
   },
 
-  // Andhrawala (2004)
+  // Andhrawala
   'andhrawala': {
-    landscape: '/banners/Andhrawala/Andhrawala%20L.png',
-    portrait:  '/banners/Andhrawala/Andhrawala%20p.png',
+    landscape: '/banners/Andhrawala/Andhrawala L.png',
+    portrait: '/banners/Andhrawala/Andhrawala p.png',
   },
 
-  // Ashok (2006)
+  // Ashok
   'ashok': {
-    landscape: '/banners/Ashok/Ashok%20L.png',
-    portrait:  '/banners/Ashok/Ashok%20P.jpg',
+    landscape: '/banners/Ashok/Ashok L.png',
+    portrait: '/banners/Ashok/Ashok P.jpg',
   },
 
-  // Aravindha Sametha → ASVR (2018)
+  // Aravindha Sametha Veera Raghava → ASVR
   'aravindha sametha': {
-    landscape: '/banners/ASVR/ASVR%20L.png',
-    portrait:  '/banners/ASVR/ASVR%20P.png',
+    landscape: '/banners/ASVR/ASVR L.png',
+    portrait: '/banners/ASVR/ASVR P.png',
   },
 
-  // Brindavanam (2010)
+  // Brindavanam
   'brindavanam': {
-    landscape: '/banners/Brindavanam/Brindavanam%20L.png',
-    portrait:  '/banners/Brindavanam/Brindavanam%20P.png',
+    landscape: '/banners/Brindavanam/Brindavanam L.png',
+    portrait: '/banners/Brindavanam/Brindavanam P.png',
   },
 
-  // Jai Lava Kusa → JLK (2017)
+  // Jai Lava Kusa → JLK
   'jai lava kusa': {
-    landscape: '/banners/JLK/JLK%20L.png',
-    portrait:  '/banners/JLK/JLK%20P.png',
+    landscape: '/banners/JLK/JLK L.png',
+    portrait: '/banners/JLK/JLK P.png',
   },
 
-  // Janatha Garage → JNG (2016) — no landscape yet
+  // Janatha Garage → JNG
   'janatha garage': {
-    landscape: null,
-    portrait:  '/banners/JNG/JNG%20P.png',
+    landscape: null,                          // no landscape banner available
+    portrait: '/banners/JNG/JNG P.png',
   },
 
-  // Kantri (2008)
+  // Kantri
   'kantri': {
-    landscape: '/banners/Kantri/Kantri%20L.png',
-    portrait:  '/banners/Kantri/Kantri%20P.jpg',
+    landscape: '/banners/Kantri/Kantri L.png',
+    portrait: '/banners/Kantri/Kantri P.jpg',
   },
 
-  // Naa Alludu (2005)
+  // Naa Alludu
   'naa alludu': {
-    landscape: '/banners/Naa%20Alludu/Naa%20Alludu%20L.png',
-    portrait:  '/banners/Naa%20Alludu/Naa%20Alludu%20P.jpg',
+    landscape: '/banners/Naa Alludu/Naa Alludu L.png',
+    portrait: '/banners/Naa Alludu/Naa Alludu P.jpg',
   },
 
-  // Naaga (2003)
+  // Naaga
   'naaga': {
-    landscape: '/banners/Naaga/Naaga%20L.png',
-    portrait:  '/banners/Naaga/Naaga%20P.jpg',
+    landscape: '/banners/Naaga/Naaga L.png',
+    portrait: '/banners/Naaga/Naaga P.jpg',
   },
 
-  // Narasimhudu (2005)
+  // Narasimhudu
   'narasimhudu': {
-    landscape: '/banners/Narasimhudu/Narasimhudu%20L.png',
-    portrait:  '/banners/Narasimhudu/Narasimhudu%20P.jpg',
+    landscape: '/banners/Narasimhudu/Narasimhudu L.png',
+    portrait: '/banners/Narasimhudu/Narasimhudu P.jpg',
   },
 
-  // Nannaku Prematho → NKP (2016) — no landscape yet
+  // Nannaku Prematho → NKP
   'nannaku prematho': {
     landscape: null,
-    portrait:  '/banners/NKP/NKP%20P.png',
+    portrait: '/banners/NKP/NKP P.png',
   },
 
-  // Rabhasa (2014) — no landscape yet
+
+  // Rabhasa
   'rabhasa': {
     landscape: null,
-    portrait:  '/banners/Rabhasa/Rabhasa%20P.png',
+    portrait: '/banners/Rabhasa/Rabhasa P.png',
   },
 
-  // Ramayya Vasthavayya → RMV (2013)
+  // Ramayya Vasthavayya → RMV
   'ramayya vasthavayya': {
-    landscape: '/banners/RMV/RMV%20L.png',
-    portrait:  '/banners/RMV/RMV%20P.png',
+    landscape: '/banners/RMV/RMV L.png',
+    portrait: '/banners/RMV/RMV P.png',
   },
 
-  // Samba (2004)
+  // Samba
   'samba': {
-    landscape: '/banners/Sambha/Samba%20L.png',
-    portrait:  '/banners/Sambha/Sambha%20P.jpg',
+    landscape: '/banners/Sambha/Samba L.png',
+    portrait: '/banners/Sambha/Sambha P.jpg',
   },
 
-  // Shakti (2011)
+  // Shakti
   'shakti': {
-    landscape: '/banners/Shakti/Shakti%20L.png',
-    portrait:  '/banners/Shakti/Shakti%20P.png',
+    landscape: '/banners/Shakti/Shakti L.png',
+    portrait: '/banners/Shakti/Shakti P.png',
   },
 
-  // Simhadri (2003)
+  // Simhadri
   'simhadri': {
-    landscape: '/banners/Simhadri/Simhadri%20L.png',
-    portrait:  '/banners/Simhadri/Simhadri%20P.jpg',
+    landscape: '/banners/Simhadri/Simhadri L.png',
+    portrait: '/banners/Simhadri/Simhadri P.jpg',
   },
 
-  // Student No. 1 (2001)
+  // Student No. 1
   'student no. 1': {
-    landscape: '/banners/Student%20No1/Student%20No1%20L.png',
-    portrait:  '/banners/Student%20No1/Student%20No1%20P.png',
+    landscape: '/banners/Student No1/Student No1 L.png',
+    portrait: '/banners/Student No1/Student No1 P.png',
   },
 
-  // Subbu (2001)
+  // Subbu
   'subbu': {
-    landscape: '/banners/Subbu/Subbu%20L.png',
-    portrait:  '/banners/Subbu/Subbu%20P.jpg',
+    landscape: '/banners/Subbu/Subbu L.png',
+    portrait: '/banners/Subbu/Subbu P.jpg',
   },
 
-  // Temper (2015) — no landscape yet
+  // Temper
   'temper': {
     landscape: null,
-    portrait:  '/banners/Temper/Temper%20P.png',
+    portrait: '/banners/Temper/Temper P.png',
   },
 
-  // Yamadonga (2007)
+  // Yamadonga
   'yamadonga': {
-    landscape: '/banners/Yamadonga/Yamadonga%20L.png',
-    portrait:  '/banners/Yamadonga/Yamadonga%20P.jpg',
+    landscape: '/banners/Yamadonga/Yamadonga L.png',
+    portrait: '/banners/Yamadonga/Yamadonga P.jpg',
   },
 };
 
 /**
  * Get the landscape (hero background) banner URL for a movie.
- * Falls back to Tiger Nation logo when no local banner exists.
+ * Falls back to the movie's existing banner_url / poster_url, then to null.
  *
- * @param {string} title — movie.title from the API
- * @returns {string}
+ * @param {string} title  — movie.title from the API
+ * @param {string} fallback — URL to use if no local banner exists
+ * @returns {string|null}
  */
-export function getLandscapeBanner(title) {
+export function getLandscapeBanner(title, fallback = null) {
   const key = (title || '').toLowerCase().trim();
   const entry = BANNER_MAP[key];
   if (entry && entry.landscape) return entry.landscape;
-  return TIGER_LOGO;
+  return fallback;
 }
 
 /**
  * Get the portrait (sidebar thumbnail) banner URL for a movie.
- * Falls back to Tiger Nation logo when no local banner exists.
  *
- * @param {string} title — movie.title from the API
- * @param {string} [apiFallback] — API poster_url to try before logo
- * @returns {string}
+ * @param {string} title  — movie.title from the API
+ * @param {string} fallback — URL to use if no local banner exists
+ * @returns {string|null}
  */
-export function getPortraitBanner(title, apiFallback) {
+export function getPortraitBanner(title, fallback = null) {
   const key = (title || '').toLowerCase().trim();
   const entry = BANNER_MAP[key];
   if (entry && entry.portrait) return entry.portrait;
-  if (apiFallback) return apiFallback;
-  return TIGER_LOGO;
+  return fallback;
 }

@@ -22,6 +22,8 @@ class Movie(TimestampedModel):
     director = models.CharField(max_length=100, null=True, blank=True)
     box_office = models.CharField(max_length=100, null=True, blank=True)
 
+    objects = models.Manager()
+
     class Meta:
         ordering = ['-release_year', 'title']
         indexes = [
@@ -29,10 +31,10 @@ class Movie(TimestampedModel):
             models.Index(fields=['-release_year']),
         ]
 
-    def __str__(self):
-        return self.title
+    def __str__(self) -> str:
+        return str(self.title)
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = str(slugify(self.title))  # type: ignore
         super().save(*args, **kwargs)
