@@ -1,184 +1,124 @@
+import { getR2Url } from '../config/links';
+import TigerIcon from '../assets/Tigericon.jpg';
+
 /**
  * Banner mapping for NTR Filmography.
- * Maps movie title (or slug key) to landscape (L) and portrait (P) banner paths.
- *
- * Folder naming convention in /public/banners/:
- *   <FolderName>/<FolderName> L.<ext>   — landscape banner (hero background)
- *   <FolderName>/<FolderName> P.<ext>   — portrait banner  (sidebar thumbnail)
- *
- * Some movies use abbreviations (ASVR, JLK, JNG, NKP, RMV).
- * Some portrait files have lowercase "p" — all paths are handled here.
+ * Dynamically fetches from Cloudflare R2 bucket instead of local files.
+ * 
+ * Assumes you will upload files to R2 in a `/banners/` folder like:
+ *   /banners/{slug}-landscape.jpg
+ *   /banners/{slug}-portrait.jpg
  */
-
-const BANNER_MAP = {
-  // title (lowercase, trimmed) → { landscape, portrait }
-
-  // Adhurs / Aadhurs
-  'adhurs': {
-    landscape: '/banners/Aadhurs/Aadhurs L.png',
-    portrait: '/banners/Aadhurs/Aadhurs P.jpg',
-  },
-
-  // Aadi
-  'aadi': {
-    landscape: '/banners/Aadi/Aadi L.png',
-    portrait: '/banners/Aadi/Aadi P.png',
-  },
-
-  // Allari Ramudu
-  'allari ramudu': {
-    landscape: '/banners/Allari Ramudu/Allari Ramudu L.png',
-    portrait: '/banners/Allari Ramudu/Allari Ramudu P.jpg',
-  },
-
-  // Andhrawala
-  'andhrawala': {
-    landscape: '/banners/Andhrawala/Andhrawala L.png',
-    portrait: '/banners/Andhrawala/Andhrawala p.png',
-  },
-
-  // Ashok
-  'ashok': {
-    landscape: '/banners/Ashok/Ashok L.png',
-    portrait: '/banners/Ashok/Ashok P.jpg',
-  },
-
-  // Aravindha Sametha Veera Raghava → ASVR
-  'aravindha sametha': {
-    landscape: '/banners/ASVR/ASVR L.png',
-    portrait: '/banners/ASVR/ASVR P.png',
-  },
-
-  // Brindavanam
-  'brindavanam': {
-    landscape: '/banners/Brindavanam/Brindavanam L.png',
-    portrait: '/banners/Brindavanam/Brindavanam P.png',
-  },
-
-  // Jai Lava Kusa → JLK
-  'jai lava kusa': {
-    landscape: '/banners/JLK/JLK L.png',
-    portrait: '/banners/JLK/JLK P.png',
-  },
-
-  // Janatha Garage → JNG
-  'janatha garage': {
-    landscape: null,                          // no landscape banner available
-    portrait: '/banners/JNG/JNG P.png',
-  },
-
-  // Kantri
-  'kantri': {
-    landscape: '/banners/Kantri/Kantri L.png',
-    portrait: '/banners/Kantri/Kantri P.jpg',
-  },
-
-  // Naa Alludu
-  'naa alludu': {
-    landscape: '/banners/Naa Alludu/Naa Alludu L.png',
-    portrait: '/banners/Naa Alludu/Naa Alludu P.jpg',
-  },
-
-  // Naaga
-  'naaga': {
-    landscape: '/banners/Naaga/Naaga L.png',
-    portrait: '/banners/Naaga/Naaga P.jpg',
-  },
-
-  // Narasimhudu
-  'narasimhudu': {
-    landscape: '/banners/Narasimhudu/Narasimhudu L.png',
-    portrait: '/banners/Narasimhudu/Narasimhudu P.jpg',
-  },
-
-  // Nannaku Prematho → NKP
-  'nannaku prematho': {
-    landscape: null,
-    portrait: '/banners/NKP/NKP P.png',
-  },
-
-
-  // Rabhasa
-  'rabhasa': {
-    landscape: null,
-    portrait: '/banners/Rabhasa/Rabhasa P.png',
-  },
-
-  // Ramayya Vasthavayya → RMV
-  'ramayya vasthavayya': {
-    landscape: '/banners/RMV/RMV L.png',
-    portrait: '/banners/RMV/RMV P.png',
-  },
-
-  // Samba
-  'samba': {
-    landscape: '/banners/Sambha/Samba L.png',
-    portrait: '/banners/Sambha/Sambha P.jpg',
-  },
-
-  // Shakti
-  'shakti': {
-    landscape: '/banners/Shakti/Shakti L.png',
-    portrait: '/banners/Shakti/Shakti P.png',
-  },
-
-  // Simhadri
-  'simhadri': {
-    landscape: '/banners/Simhadri/Simhadri L.png',
-    portrait: '/banners/Simhadri/Simhadri P.jpg',
-  },
-
-  // Student No. 1
-  'student no. 1': {
-    landscape: '/banners/Student No1/Student No1 L.png',
-    portrait: '/banners/Student No1/Student No1 P.png',
-  },
-
-  // Subbu
-  'subbu': {
-    landscape: '/banners/Subbu/Subbu L.png',
-    portrait: '/banners/Subbu/Subbu P.jpg',
-  },
-
-  // Temper
-  'temper': {
-    landscape: null,
-    portrait: '/banners/Temper/Temper P.png',
-  },
-
-  // Yamadonga
-  'yamadonga': {
-    landscape: '/banners/Yamadonga/Yamadonga L.png',
-    portrait: '/banners/Yamadonga/Yamadonga P.jpg',
-  },
-};
 
 /**
  * Get the landscape (hero background) banner URL for a movie.
- * Falls back to the movie's existing banner_url / poster_url, then to null.
  *
- * @param {string} title  — movie.title from the API
- * @param {string} fallback — URL to use if no local banner exists
- * @returns {string|null}
+ * @param {Object} movie  — movie object from the API
+ * @returns {string}
  */
-export function getLandscapeBanner(title, fallback = null) {
-  const key = (title || '').toLowerCase().trim();
-  const entry = BANNER_MAP[key];
-  if (entry && entry.landscape) return entry.landscape;
+export function getLandscapeBanner(movie) {
+  if (!movie) return '/tiger-nation-logo-landscape.jpg';
+  
+  // If the backend has a specific banner_url (and it's not the old default placeholder), use it
+  if (movie.banner_url && !movie.banner_url.includes('wp5283563.jpg')) {
+    return movie.banner_url;
+  }
+
+  // Otherwise, fallback to the new R2 folder structure using the slug
+  if (movie.slug) {
+    return getR2Url(`/banners/${movie.slug}-landscape.jpg`);
+  }
+  
   return '/tiger-nation-logo-landscape.jpg';
 }
 
 /**
  * Get the portrait (sidebar thumbnail) banner URL for a movie.
  *
- * @param {string} title  — movie.title from the API
- * @param {string} fallback — URL to use if no local banner exists
- * @returns {string|null}
+ * @param {Object} movie  — movie object from the API
+ * @returns {string}
  */
-export function getPortraitBanner(title, fallback = null) {
-  const key = (title || '').toLowerCase().trim();
-  const entry = BANNER_MAP[key];
-  if (entry && entry.portrait) return entry.portrait;
+export function getPortraitBanner(movie) {
+  if (!movie) return '/tiger-nation-logo-portrait.jpg';
+  
+  // If the backend has a specific poster_url (and it's not the old default placeholder), use it
+  if (movie.poster_url && !movie.poster_url.includes('wp5283563.jpg')) {
+    return movie.poster_url;
+  }
+
+  // Otherwise, fallback to the new R2 folder structure using the slug
+  if (movie.slug) {
+    return getR2Url(`/banners/${movie.slug}-portrait.jpg`);
+  }
+  
   return '/tiger-nation-logo-portrait.jpg';
 }
 
+/**
+ * Map known folder names (lowercase, trimmed) to their exact portrait filename.
+ * If a folder matches a movie, we use its poster.
+ */
+const FOLDER_TO_POSTER_MAP = {
+  'ninnu choodalani': 'NINNU CHUDALANI.png',
+  'student no1': 'STUDENT No1.png',
+  'student no. 1': 'STUDENT No1.png',
+  'subbu': 'SUBBU.png',
+  'aadi': 'AADI.png',
+  'aadi_': 'AADI.png',
+  'allari ramudu': 'ALLARI RAMUDU.png',
+  'naaga': 'NAAGA.png',
+  'simhadri': 'SIMHADRI.png',
+  'andhrawala': 'ANDHRAWALA.png',
+  'samba': 'SAMBA.png',
+  'naa alludu': 'NAA ALLUDU.png',
+  'narasimhudu': 'NARASIMHUDU.png',
+  'ashok': 'ASHOK.png',
+  'rakhi': 'RAKHI.png',
+  'yamadonga': 'YAMADONGA.png',
+  'kantri': 'KANTRI.png',
+  'adhurs': 'Adhurs.png',
+  'brindaavanam': 'BRINDHAVANAM.png',
+  'brindavanam': 'BRINDHAVANAM.png',
+  'shakti': 'SHAKTI.png',
+  'oosaravelli': 'Oosaravalli.png',
+  'dhammu': 'DHAMMU.png',
+  'baadshah': 'BAADSHAH.png',
+  'ramayya vastavayya': 'RAMAYYA VASTAVAYYA.png',
+  'ramayya vasthavayya': 'RAMAYYA VASTAVAYYA.png',
+  'rabhasa': 'RABASA.png',
+  'temper': 'TEMPER.png',
+  'nannaku prematho': 'NKP.png',
+  'nannaku prematho_': 'NKP.png',
+  'jantha garage': 'JANATAGARAGE.png',
+  'janatha garage': 'JANATAGARAGE.png',
+  'janatha garage_': 'JANATAGARAGE.png',
+  'jai lava kusa': 'JAI LAVAKUSA.png',
+  'aravinda sametha': 'ARAVINDA SAMETHA.png',
+  'rrr': 'RRR.png',
+  'devara': 'DEVARA.png',
+  'war2': 'WAR2.png',
+  'war 2': 'WAR2.png',
+};
+
+/**
+ * Get the portrait thumbnail URL for a folder.
+ * Uses THUMBNAIL_P bucket files for movies, or Tigericon.jpg for non-movies.
+ *
+ * @param {string} folderName  — folder name from API
+ * @returns {string}
+ */
+export function getFolderThumbnail(folderName) {
+  if (!folderName) return TigerIcon;
+
+  // Case-insensitive trimmed lookup
+  const key = folderName.toLowerCase().trim();
+  const filename = FOLDER_TO_POSTER_MAP[key];
+  if (filename) {
+    // encodeURIComponent handles spaces but leaves other things, safer to just replace spaces for R2
+    const encodedFilename = filename.replace(/ /g, '%20');
+    return `https://ntrfilmography.live/THUMBNAIL_P/${encodedFilename}`;
+  }
+
+  // Fallback for non-movie folders
+  return TigerIcon;
+}

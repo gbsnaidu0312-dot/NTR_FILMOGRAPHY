@@ -6,6 +6,7 @@ import { handleApiError } from '../utils/helpers';
 import { LoadingSpinner, ErrorBoundary, EmptyState } from '../components/Common';
 import { FilmReelIcon, CalendarStarIcon, FolderIcon, CameraIcon } from '../assets/icons';
 import { getR2Url } from '../config/links';
+import { getFolderThumbnail } from '../utils/banners';
 
 // Grid view icons
 const GridLargeIcon = () => (
@@ -64,7 +65,8 @@ const HeartIcon = ({ filled }) => (
 
 const PhotoFolderCard = ({ folder, index, onClick }) => {
   const [imgError, setImgError] = React.useState(false);
-  const showPlaceholder = imgError || !folder.thumbnail_url || folder.thumbnail_url === 'null';
+  const thumbnailSrc = getFolderThumbnail(folder.name);
+  const showPlaceholder = imgError || !thumbnailSrc;
 
   return (
     <motion.button
@@ -78,7 +80,7 @@ const PhotoFolderCard = ({ folder, index, onClick }) => {
       <div className="relative rounded-lg overflow-hidden mb-3 aspect-square border border-blue-500/20 group-hover:border-blue-400/50 transition-colors">
         {!showPlaceholder ? (
           <img
-            src={folder.thumbnail_url}
+            src={thumbnailSrc}
             alt={folder.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onError={() => setImgError(true)}

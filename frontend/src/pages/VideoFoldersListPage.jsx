@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { videosApi } from '../services/api';
 import { getR2Url } from '../config/links';
+import { getFolderThumbnail } from '../utils/banners';
 import { LoadingSpinner, EmptyState } from '../components/Common';
 
 const FolderCard = ({ folder, onClick, index }) => {
@@ -34,7 +35,7 @@ const FolderCard = ({ folder, onClick, index }) => {
       <div className="relative rounded-xl overflow-hidden shadow-lg shadow-black/50 aspect-[3/4] border border-blue-500/20 group-hover:border-blue-400/50 transition-colors">
         {!showPlaceholder ? (
           <img
-            src={folder.thumbnail_url}
+            src={getFolderThumbnail(folder.name)}
             alt={folder.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onError={() => setImgError(true)}

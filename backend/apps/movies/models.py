@@ -21,14 +21,15 @@ class Movie(TimestampedModel):
     genre = models.CharField(max_length=100, null=True, blank=True)
     director = models.CharField(max_length=100, null=True, blank=True)
     box_office = models.CharField(max_length=100, null=True, blank=True)
+    sort_order = models.IntegerField(default=0)
 
     objects = models.Manager()
 
     class Meta:
-        ordering = ['-release_year', 'title']
+        ordering = ['sort_order']
         indexes = [
             models.Index(fields=['slug']),
-            models.Index(fields=['-release_year']),
+            models.Index(fields=['sort_order']),
         ]
 
     def __str__(self) -> str:

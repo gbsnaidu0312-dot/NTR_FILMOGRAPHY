@@ -313,6 +313,16 @@ MOVIES = [
         'box_office': '$100M+',
         'r2_folder': 'Devara',  # Audio, Photos/Movie, Movie Cuts, Video Songs
     },
+    {
+        'title': 'War 2',
+        'release_year': 2025,
+        'description': 'An upcoming high-octane spy thriller featuring an epic face-off.',
+        'genre': 'Action, Thriller, Spy',
+        'director': 'Ayan Mukerji',
+        'duration_minutes': 160,
+        'box_office': '',
+        'r2_folder': 'War 2',  # Audio, Photos/Movie, Movie Cuts, Video Songs
+    },
 ]
 
 # Photo folder type mapping from bucket folder names to model types

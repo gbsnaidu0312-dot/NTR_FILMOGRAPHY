@@ -166,14 +166,12 @@ export const MoviesPage = () => {
             <button
               key={movie.id}
               onClick={() => setSelectedIndex(i)}
-              className={`relative flex flex-col items-center transition-all duration-300 ${
-                i === selectedIndex ? 'scale-105' : 'opacity-50 hover:opacity-80'
-              }`}
+              className={`relative flex flex-col items-center transition-all duration-300 ${i === selectedIndex ? 'scale-105' : 'opacity-50 hover:opacity-80'
+                }`}
             >
               <span
-                className={`text-[10px] md:text-xs font-bold mb-2 text-center px-1 truncate max-w-full ${
-                  i === selectedIndex ? 'text-gold' : 'text-gray-600'
-                }`}
+                className={`text-[10px] md:text-xs font-bold mb-2 text-center px-1 truncate max-w-full ${i === selectedIndex ? 'text-gold' : 'text-gray-600'
+                  }`}
                 style={{ fontFamily: "'Cinzel', serif", maxWidth: `${Math.max(80, sidebarWidth * 0.65)}px` }}
                 title={movie.title}
               >
@@ -189,7 +187,7 @@ export const MoviesPage = () => {
                 }}
               >
                 <img
-                  src={getPortraitBanner(movie.title, movie.poster_url || getR2Url('/wp5283563.jpg'))}
+                  src={getPortraitBanner(movie)}
                   alt={movie.title}
                   className="w-full h-full object-cover"
                 />
@@ -228,7 +226,7 @@ export const MoviesPage = () => {
               {/* Hero Section — fills viewport */}
               <div className="relative min-h-screen flex">
                 {/* Left: Movie Info */}
-                <div className="relative z-10 flex flex-col justify-center p-6 md:p-12 w-full md:w-1/2">
+                <div className="relative z-10 flex flex-col justify-center p-6 md:p-12 w-full md:w-[40%] lg:w-1/3">
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -261,11 +259,10 @@ export const MoviesPage = () => {
                             setPlayMovie(selectedMovie);
                           }
                         }}
-                        className={`flex items-center gap-2 px-6 py-2.5 font-bold rounded-md transition-colors ${
-                          selectedMovie?.movie_url
-                            ? 'bg-gray-200 text-dark hover:bg-white'
-                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                        }`}
+                        className={`flex items-center gap-2 px-6 py-2.5 font-bold rounded-md transition-colors ${selectedMovie?.movie_url
+                          ? 'bg-gray-200 text-dark hover:bg-white'
+                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="5 3 19 12 5 21 5 3" />
@@ -274,11 +271,10 @@ export const MoviesPage = () => {
                       </button>
                       <button
                         onClick={handleDownload}
-                        className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-md border transition-colors ${
-                          selectedMovie?.movie_url
-                            ? 'border-gray-500 text-gray-300 hover:border-gray-300 hover:text-white'
-                            : 'border-gray-700 text-gray-600 cursor-not-allowed'
-                        }`}
+                        className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-md border transition-colors ${selectedMovie?.movie_url
+                          ? 'border-gray-500 text-gray-300 hover:border-gray-300 hover:text-white'
+                          : 'border-gray-700 text-gray-600 cursor-not-allowed'
+                          }`}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -289,11 +285,10 @@ export const MoviesPage = () => {
                       </button>
                       <button
                         onClick={handleShare}
-                        className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-md border transition-colors relative ${
-                          selectedMovie?.movie_url
-                            ? 'border-gray-500 text-gray-300 hover:border-gray-300 hover:text-white'
-                            : 'border-gray-700 text-gray-600 cursor-not-allowed'
-                        }`}
+                        className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-md border transition-colors relative ${selectedMovie?.movie_url
+                          ? 'border-gray-500 text-gray-300 hover:border-gray-300 hover:text-white'
+                          : 'border-gray-700 text-gray-600 cursor-not-allowed'
+                          }`}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <circle cx="18" cy="5" r="3" />
@@ -317,18 +312,22 @@ export const MoviesPage = () => {
                           )}
                         </AnimatePresence>
                       </button>
+
                     </div>
                   </motion.div>
                 </div>
 
                 {/* Right: Movie Image */}
-                <div className="absolute md:relative right-0 top-0 bottom-0 w-full md:w-1/2">
+                <div className="absolute md:relative right-0 top-0 bottom-0 w-full md:w-[60%] lg:w-2/3">
                   <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url('${getLandscapeBanner(selectedMovie.title)}')` }}
+                    className="absolute inset-0 bg-cover bg-right"
+                    style={{ backgroundImage: `url('${getLandscapeBanner(selectedMovie)}')` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-dark via-dark/60 to-transparent md:via-dark/30" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent" />
+                  {/* Mobile full fade for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-dark via-dark/60 to-transparent md:hidden" />
+                  {/* Desktop ultra-sharp seam fade */}
+                  <div className="hidden md:block absolute left-0 top-0 bottom-0 w-20 lg:w-30 bg-gradient-to-r from-dark to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
                 </div>
 
                 {/* Favorite Button */}
@@ -366,115 +365,112 @@ export const MoviesPage = () => {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                <div className="space-y-1 pt-4">
-                  {audioSongs.map((song, i) => {
-                    const isCurrentSong = currentSong?.id === song.id;
-                    return (
-                      <motion.div
-                        key={song.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        onClick={() => handlePlaySong(song)}
-                        className={`group flex items-center gap-4 py-3 px-3 rounded-lg cursor-pointer transition-all duration-300 ${
-                          isCurrentSong
-                            ? 'bg-gold/10'
-                            : 'hover:bg-white/5'
-                        }`}
-                      >
-                        {/* Song Thumbnail */}
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden flex-shrink-0">
-                          <img
-                            src={getPortraitBanner(selectedMovie?.title, selectedMovie?.poster_url || getR2Url('/wp5283563.jpg'))}
-                            alt={song.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                      <div className="space-y-1 pt-4">
+                        {audioSongs.map((song, i) => {
+                          const isCurrentSong = currentSong?.id === song.id;
+                          return (
+                            <motion.div
+                              key={song.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.05 }}
+                              onClick={() => handlePlaySong(song)}
+                              className={`group flex items-center gap-4 py-3 px-3 rounded-lg cursor-pointer transition-all duration-300 ${isCurrentSong
+                                ? 'bg-gold/10'
+                                : 'hover:bg-white/5'
+                                }`}
+                            >
+                              {/* Song Thumbnail */}
+                              <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden flex-shrink-0">
+                                <img
+                                  src={getPortraitBanner(selectedMovie)}
+                                  alt={song.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
 
-                        {/* Song Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4
-                            className={`font-semibold text-sm md:text-base truncate ${
-                              isCurrentSong ? 'text-gold' : 'text-gray-200 group-hover:text-gold'
-                            }`}
-                          >
-                            {song.title}
-                          </h4>
-                          <p className="text-xs text-gray-500 truncate">{song.artist}</p>
-                        </div>
+                              {/* Song Info */}
+                              <div className="flex-1 min-w-0">
+                                <h4
+                                  className={`font-semibold text-sm md:text-base truncate ${isCurrentSong ? 'text-gold' : 'text-gray-200 group-hover:text-gold'
+                                    }`}
+                                >
+                                  {song.title}
+                                </h4>
+                                <p className="text-xs text-gray-500 truncate">{song.artist}</p>
+                              </div>
 
-                        {/* Duration */}
-                        <span className="text-xs text-gray-500 hidden md:block">
-                          {formatDuration(song.duration_seconds)}
-                        </span>
+                              {/* Duration */}
+                              <span className="text-xs text-gray-500 hidden md:block">
+                                {formatDuration(song.duration_seconds)}
+                              </span>
 
-                        {/* Play Button */}
-                        <button
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                            isCurrentSong
-                              ? 'bg-gold text-dark'
-                              : 'bg-gray-700 text-gray-300 group-hover:bg-gold group-hover:text-dark'
-                          }`}
-                        >
-                          {isCurrentSong ? (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                          ) : (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                          )}
-                        </button>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                {/* Player — inline below playlist */}
-                <AnimatePresence>
-                  {currentSong && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-6 bg-[#0d0d0d] border border-gold/10 rounded-xl px-4 md:px-6 py-4"
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Current Song Info */}
-                        <div className="flex items-center gap-3 w-[180px] md:w-[240px] flex-shrink-0">
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden">
-                            <img
-                              src={getPortraitBanner(selectedMovie?.title, selectedMovie?.poster_url || getR2Url('/wp5283563.jpg'))}
-                              alt={currentSong.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="text-gold text-sm font-semibold truncate">
-                              {currentSong.title}
-                            </h4>
-                            <p className="text-xs text-gray-500 truncate">
-                              {selectedMovie?.title}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Audio Element */}
-                        <div className="flex-1">
-                          <audio
-                            controls
-                            autoPlay
-                            className="w-full"
-                            controlsList="nodownload"
-                            src={currentSong.audio_url}
-                          />
-                        </div>
+                              {/* Play Button */}
+                              <button
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isCurrentSong
+                                  ? 'bg-gold text-dark'
+                                  : 'bg-gray-700 text-gray-300 group-hover:bg-gold group-hover:text-dark'
+                                  }`}
+                              >
+                                {isCurrentSong ? (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                  </svg>
+                                ) : (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                  </svg>
+                                )}
+                              </button>
+                            </motion.div>
+                          );
+                        })}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+
+                      {/* Player — inline below playlist */}
+                      <AnimatePresence>
+                        {currentSong && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-6 bg-[#0d0d0d] border border-gold/10 rounded-xl px-4 md:px-6 py-4"
+                          >
+                            <div className="flex items-center gap-4">
+                              {/* Current Song Info */}
+                              <div className="flex items-center gap-3 w-[180px] md:w-[240px] flex-shrink-0">
+                                <div className="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden">
+                                  <img
+                                    src={getPortraitBanner(selectedMovie)}
+                                    alt={currentSong.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="text-gold text-sm font-semibold truncate">
+                                    {currentSong.title}
+                                  </h4>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    {selectedMovie?.title}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Audio Element */}
+                              <div className="flex-1">
+                                <audio
+                                  controls
+                                  autoPlay
+                                  className="w-full"
+                                  controlsList="nodownload"
+                                  src={currentSong.audio_url}
+                                />
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </motion.div>
                   )}
                 </AnimatePresence>
