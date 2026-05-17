@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TigerLogo } from '../assets/icons';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +26,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <TigerLogo width={32} height={32} />
+            <img src="/src/assets/Tigericon.jpg" alt="Tiger" className="w-9 h-9 rounded-full object-cover" />
             <div className="hidden sm:block">
               <p
                 className="text-gold font-bold text-sm tracking-wider"
