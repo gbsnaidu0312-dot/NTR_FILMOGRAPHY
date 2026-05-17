@@ -7,6 +7,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatDuration } from '../utils/helpers';
 import { LoadingSpinner, EmptyState, VideoPlayer } from './Common';
 import { getR2Url } from '../config/links';
+import { getFolderThumbnail } from '../utils/banners';
+import TigerIcon from '../assets/Tigericon.jpg';
+
+// Helper to check if a URL points to a video file
+const isVideoLink = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.endsWith('.mp4') || lower.endsWith('.mkv') || lower.endsWith('.webm') || lower.endsWith('.mov');
+};
 
 // ─── Mini Icons ────────────────────────────────────────────────────────────────
 const GridLargeIcon = () => (
@@ -29,13 +38,14 @@ const HeartIcon = ({ filled }) => (
 );
 
 // ─── Hover Video Player ────────────────────────────────────────────────────────
-const HoverVideoPlayer = ({ videoSrc, posterSrc, durationSeconds, isHovered }) => {
+const HoverVideoPlayer = ({ videoSrc, posterSrc, durationSeconds, isHovered, onDurationLoaded }) => {
   const videoRef = React.useRef(null);
   const isMp4 = videoSrc && videoSrc.toLowerCase().endsWith('.mp4');
 
   React.useEffect(() => {
     if (isMp4 && videoRef.current) {
       if (isHovered) {
+        videoRef.current.preload = 'auto';
         videoRef.current.play().catch(() => {});
       } else {
         videoRef.current.pause();
@@ -63,7 +73,13 @@ const HoverVideoPlayer = ({ videoSrc, posterSrc, durationSeconds, isHovered }) =
       muted
       loop
       playsInline
-      preload="metadata"
+      preload="none"
+      poster={posterSrc}
+      onLoadedMetadata={(e) => {
+        if (e.target.duration && onDurationLoaded) {
+          onDurationLoaded(Math.round(e.target.duration));
+        }
+      }}
       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
     />
   );
@@ -72,7 +88,35 @@ const HoverVideoPlayer = ({ videoSrc, posterSrc, durationSeconds, isHovered }) =
 // ─── Video Card ───────────────────────────────────────────────────────────────
 const VideoCard = ({ video, index, gridView, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [actualDuration, setActualDuration] = useState(video.duration_seconds);
   const aspectClass = gridView === 'large' ? 'aspect-video' : 'aspect-video';
+
+  // Determine the correct visual thumbnail for the video card
+  const posterSrc = React.useMemo(() => {
+    // If the database has a real image thumbnail (and not a copy of the mp4 URL)
+    if (video.thumbnail_url && !isVideoLink(video.thumbnail_url)) {
+      return video.thumbnail_url;
+    }
+    
+    // Fallback 1: Use movie_banner if available from the serializer
+    if (video.movie_banner) {
+      return video.movie_banner;
+    }
+
+    // Fallback 2: Use movie_poster if available from the serializer
+    if (video.movie_poster) {
+      return video.movie_poster;
+    }
+
+    // Fallback 3: Try folder-level mapping (covers movies like Aadi, Janatha Garage, etc.)
+    if (video.folder_name) {
+      return getFolderThumbnail(video.folder_name);
+    }
+
+    // Fallback 4: Default premium logo
+    return TigerIcon;
+  }, [video]);
+
   return (
     <motion.button
       onClick={() => onClick(index)}
@@ -87,9 +131,10 @@ const VideoCard = ({ video, index, gridView, onClick }) => {
       <div className={`relative rounded-xl overflow-hidden ${aspectClass} shadow-md shadow-black/40 border border-blue-500/20 group-hover:border-blue-400/50 transition-colors`}>
         <HoverVideoPlayer 
           videoSrc={video.video_url} 
-          posterSrc={video.thumbnail_url} 
-          durationSeconds={video.duration_seconds} 
+          posterSrc={posterSrc} 
+          durationSeconds={actualDuration} 
           isHovered={isHovered}
+          onDurationLoaded={setActualDuration}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent group-hover:from-black/85 transition-all duration-300" />
         {/* Play button */}
@@ -101,9 +146,9 @@ const VideoCard = ({ video, index, gridView, onClick }) => {
           </div>
         </div>
         {/* Duration badge */}
-        {video.duration_seconds && (
+        {actualDuration && (
           <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-xs text-white">
-            {formatDuration(video.duration_seconds)}
+            {formatDuration(actualDuration)}
           </div>
         )}
       </div>
@@ -120,18 +165,35 @@ const VideoCard = ({ video, index, gridView, onClick }) => {
 };
 
 // ─── Video Player Modal ───────────────────────────────────────────────────────
-const PlayerModal = ({ videos, index, onClose, onPrev, onNext, onLike, likedSet, onDownload, onShare, folderName }) => {
+const PlayerModal = ({ videos, index, onClose, onPrev, onNext, onLike, likedSet, onDownload, onShare, onSelect, folderName }) => {
   const video = videos[index];
   if (!video) return null;
+
+  const bgImage = React.useMemo(() => {
+    return (video.thumbnail_url && !isVideoLink(video.thumbnail_url)) ? video.thumbnail_url :
+      video.movie_banner ? video.movie_banner :
+      video.movie_poster ? video.movie_poster :
+      video.folder_name ? getFolderThumbnail(video.folder_name) :
+      getR2Url('/tiger-nation-logo-landscape.jpg');
+  }, [video]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/96 z-50 flex flex-col"
+      className="fixed inset-0 bg-black/40 z-50 flex flex-col overflow-hidden"
     >
+      {/* Dynamic blurred ambient color backdrop */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out scale-110 pointer-events-none filter blur-[80px] opacity-35 z-0"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      />
+      {/* Glassmorphic dark overlay */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-2xl z-0" />
+
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 shrink-0 relative z-10">
         <span className="text-gray-400 text-sm truncate max-w-[50%]">{folderName}</span>
         <div className="flex items-center gap-2">
           <motion.button whileHover={{ scale: 1.05 }} onClick={onDownload}
@@ -155,7 +217,7 @@ const PlayerModal = ({ videos, index, onClose, onPrev, onNext, onLike, likedSet,
       </div>
 
       {/* Main video area */}
-      <div className="flex-1 flex items-center justify-center px-4 md:px-16 relative min-h-0">
+      <div className="flex-1 flex items-center justify-center px-4 md:px-16 relative min-h-0 z-10">
         <motion.button onClick={onPrev} whileHover={{ scale: 1.1 }}
           className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-amber-400/20 hover:bg-amber-400/40 rounded-full flex items-center justify-center text-white z-10 transition-all">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -163,7 +225,13 @@ const PlayerModal = ({ videos, index, onClose, onPrev, onNext, onLike, likedSet,
 
         <motion.div key={index} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
           className="relative max-w-5xl w-full flex flex-col items-center">
-          <VideoPlayer url={video.video_url} thumbnail={video.thumbnail_url}/>
+          <VideoPlayer url={video.video_url} thumbnail={
+            (video.thumbnail_url && !isVideoLink(video.thumbnail_url)) ? video.thumbnail_url :
+            video.movie_banner ? video.movie_banner :
+            video.movie_poster ? video.movie_poster :
+            video.folder_name ? getFolderThumbnail(video.folder_name) :
+            TigerIcon
+          }/>
           <div className="mt-4 text-center">
             <h3 className="text-amber-400 text-lg md:text-2xl font-bold mb-1" style={{ fontFamily: "'Cinzel', serif" }}>
               {video.title}
@@ -179,14 +247,43 @@ const PlayerModal = ({ videos, index, onClose, onPrev, onNext, onLike, likedSet,
       </div>
 
       {/* Thumbnail strip */}
-      <div className="shrink-0 px-4 py-3 bg-black/60">
+      <div className="shrink-0 px-4 py-3 bg-black/60 relative z-10">
         <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(251,191,36,0.3) transparent' }}>
           {videos.map((v, i) => (
             <motion.button key={v.id || i} whileHover={{ scale: 1.06 }}
-              className={`relative flex-shrink-0 rounded-lg overflow-hidden transition-all ${i === index ? 'ring-2 ring-amber-400' : 'opacity-50 hover:opacity-90'}`}
+              className={`relative flex-shrink-0 rounded-lg overflow-hidden transition-all ${i === index ? 'ring-2 ring-amber-400 opacity-100' : 'opacity-40 hover:opacity-90'}`}
               style={{ width: 96, height: 54 }}
-              onClick={() => onLike(null) || true}>
-              {/* We can't directly set index from here easily; using a wrapper instead */}
+              onClick={() => onSelect(i)}>
+              <img 
+                src={
+                  (v.thumbnail_url && !isVideoLink(v.thumbnail_url)) ? v.thumbnail_url :
+                  v.movie_banner ? v.movie_banner :
+                  v.movie_poster ? v.movie_poster :
+                  v.folder_name ? getFolderThumbnail(v.folder_name) :
+                  TigerIcon
+                } 
+                alt={v.title}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.src = getR2Url('/wp5283563.jpg'); }}
+              />
+              {/* Highlight Play Overlay */}
+              {i === index && (
+                <div className="absolute inset-0 bg-amber-400/25 flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center shadow-md border border-amber-300">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="text-black ml-0.5">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </div>
+                </div>
+              )}
+              {/* Index Badge */}
+              <div className="absolute bottom-1 right-1 bg-black/80 px-1 py-0.5 rounded text-[9px] font-bold text-amber-400 shadow">
+                {i + 1}
+              </div>
+              {/* Top hover title */}
+              <div className="absolute inset-x-0 top-0 bg-black/70 p-1 opacity-0 hover:opacity-100 transition-opacity duration-200">
+                <p className="text-[8px] text-white truncate text-center font-medium leading-none">{v.title}</p>
+              </div>
             </motion.button>
           ))}
         </div>
@@ -283,6 +380,7 @@ export const VideoGridPlayer = ({ videos, loading, folderName }) => {
             likedSet={likedVideos}
             onDownload={handleDownload}
             onShare={handleShare}
+            onSelect={setSelectedIdx}
             folderName={folderName}
           />
         )}

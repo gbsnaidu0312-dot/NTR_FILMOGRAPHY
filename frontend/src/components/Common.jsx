@@ -66,11 +66,13 @@ export const ErrorBoundary = ({ message, onRetry }) => (
 );
 
 export const VideoPlayer = ({ url, thumbnail }) => (
-  <div className="relative w-full bg-black rounded-lg overflow-hidden aspect-video">
+  <div className="relative w-full bg-black rounded-lg overflow-hidden aspect-video shadow-2xl border border-amber-400/20">
     <video
+      key={url}
       controls
       controlsList="nodownload"
       poster={thumbnail}
+      autoPlay
       className="w-full h-full"
     >
       <source src={url} type="video/mp4" />

@@ -43,7 +43,13 @@ export const VideoFolderDetailPage = ({ videoType, backPath, titlePrefix }) => {
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            onClick={() => navigate(backPath)}
+            onClick={() => {
+              if (window.history.state && window.history.state.idx > 0) {
+                navigate(-1);
+              } else {
+                navigate(backPath);
+              }
+            }}
             className="text-gray-400 hover:text-amber-400 transition-colors shrink-0"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
