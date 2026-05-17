@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import heroWallpaper from '../assets/NTRHEADER.jpg';
+import heroWallpaper from '../assets/NTR.jpg';
 import tigerIcon from '../assets/Tigericon.jpg';
 
 import { SOCIAL_LINKS } from '../config/links';
@@ -112,11 +112,11 @@ export const HeroSection = () => {
         }}
       />
 
-      {/* Dark Gradient Overlay - heavier on left for text readability */}
+      {/* Dark Gradient Overlay - lighter for better wallpaper visibility */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(90deg, rgba(10,14,39,0.92) 0%, rgba(10,14,39,0.7) 35%, rgba(10,14,39,0.3) 60%, rgba(10,14,39,0.5) 100%)',
+          background: 'linear-gradient(90deg, rgba(10,14,39,0.45) 0%, rgba(10,14,39,0.35) 35%, rgba(10,14,39,0.15) 60%, rgba(10,14,39,0.25) 100%)',
         }}
       />
 
@@ -192,10 +192,18 @@ export const HeroSection = () => {
             className="text-gold leading-none mb-3"
             style={{
               fontFamily: "'Cinzel', serif",
-              fontSize: 'clamp(2rem, 6vw, 5rem)',
+              fontSize: 'clamp(2rem, 5vw, 5rem)',
               fontWeight: 600,
               letterSpacing: '0.08em',
-              textShadow: '0 0 30px rgba(212, 175, 55, 0.25)',
+              textShadow: `
+                -1px -1px 0 rgba(0, 0, 0, 0.3),
+                1px -1px 0 rgba(0, 0, 0, 0.3),
+                -1px 1px 0 rgba(0, 0, 0, 0.3),
+                1px 1px 0 rgba(212, 175, 55, 0.3),
+                0 0 15px rgba(212, 175, 55, 0.4),
+                0 0 30px rgba(212, 175, 55, 0.3)
+              `,
+              filter: 'drop-shadow(0 0 12px rgba(212, 175, 55, 0.3))',
             }}
           >
             NANDAMURI TARAKA
@@ -204,10 +212,19 @@ export const HeroSection = () => {
             className="text-gold leading-none mb-1"
             style={{
               fontFamily: "'Cinzel', serif",
-              fontSize: 'clamp(4rem, 12vw, 10rem)',
+              fontSize: 'clamp(4rem, 11vw, 9rem)',
               fontWeight: 700,
               letterSpacing: '0.05em',
-              textShadow: '0 0 40px rgba(212, 175, 55, 0.3)',
+              textShadow: `
+                -1px -1px 0 rgba(0, 0, 0, 0.35),
+                1px -1px 0 rgba(3, 3, 3, 0.35),
+                -1px 1px 0 rgba(0, 0, 0, 0.35),
+                1px 1px 0 rgba(212, 175, 55, 0.35),
+                0 0 20px rgba(212, 175, 55, 0.5),
+                0 0 35px rgba(212, 175, 55, 0.4),
+                0 0 50px rgba(212, 175, 55, 0.25)
+              `,
+              filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.4))',
             }}
           >
             RAMARAO
@@ -217,7 +234,18 @@ export const HeroSection = () => {
             style={{
               fontFamily: "'Great Vibes', cursive",
               fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-              textShadow: '0 0 20px rgba(212, 175, 55, 0.3)',
+              textShadow: `
+                -1px -1px 0 rgba(14, 14, 14, 0.4),
+                1px -1px 0 rgba(9, 9, 8, 0.4),
+                -1px 1px 0 rgba(13, 13, 13, 0.4),
+                1px 1px 0 rgba(212, 175, 55, 0.4),
+                0 0 10px rgba(212, 175, 55, 0.5),
+                0 0 20px rgba(212, 175, 55, 0.4),
+                0 0 30px rgba(212, 175, 55, 0.3)
+              `,
+              filter: 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.35))',
+              fontWeight: 500,
+              letterSpacing: '0.02em',
             }}
           >
             — The Man of Masses, The Pride of Millions.
@@ -225,7 +253,7 @@ export const HeroSection = () => {
         </motion.div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl items-stretch">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl items-stretch">
           {cards.map((card, i) => (
             <motion.div
               key={card.title}

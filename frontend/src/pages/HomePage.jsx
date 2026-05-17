@@ -1,74 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeroSection } from '../components/HeroSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getR2Url } from '../config/links';
 
-const bioEvents = [
-  {
-    id: 1,
-    image: getR2Url('/wp5283563.jpg'),
-    date: 'May 20, 1983',
-    title: 'Birth',
-    description: 'Born as Nandamuri Taraka Rama Rao in Hyderabad to Nandamuri Harikrishna and Shalini.',
-    cardClass: 'bio-card-gold',
-  },
-  {
-    id: 2,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2001',
-    title: 'Debut Film',
-    description: 'Made his acting debut with Ninnu Choodalani at the age of 18, marking the beginning of an era.',
-    cardClass: 'bio-card-blue',
-  },
-  {
-    id: 3,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2003',
-    title: 'Simhadri Breakthrough',
-    description: 'Delivered the blockbuster Simhadri, establishing himself as a mass action hero in Telugu cinema.',
-    cardClass: 'bio-card-red',
-  },
-  {
-    id: 4,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2007',
-    title: 'Yamadonga Success',
-    description: 'Starred in Yamadonga, showcasing his versatility and earning critical acclaim for his performance.',
-    cardClass: 'bio-card-purple',
-  },
-  {
-    id: 5,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2015',
-    title: 'Temper Release',
-    description: 'Temper became a major commercial success, further cementing his status as a top-tier star.',
-    cardClass: 'bio-card-pink',
-  },
-  {
-    id: 6,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2017',
-    title: 'Jai Lava Kusa',
-    description: 'Played triple roles in Jai Lava Kusa, demonstrating extraordinary acting range and dedication.',
-    cardClass: 'bio-card-teal',
-  },
-  {
-    id: 7,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2021',
-    title: 'RRR Global Fame',
-    description: 'RRR took the world by storm. His portrayal of Komaram Bheem earned international recognition.',
-    cardClass: 'bio-card-gold',
-  },
-  {
-    id: 8,
-    image: getR2Url('/wp5283563.jpg'),
-    date: '2024',
-    title: 'Devara Release',
-    description: 'Devara Part 1 released to massive anticipation, continuing his reign at the box office.',
-    cardClass: 'bio-card-blue',
-  },
+const CARD_CLASSES = [
+  'bio-card-gold',
+  'bio-card-blue',
+  'bio-card-red',
+  'bio-card-purple',
+  'bio-card-pink',
+  'bio-card-teal',
 ];
+
+// Helper function to transform bio.json slides to card format
+const FALLBACK_IMAGE = 'https://ntrfilmography.live/sample/79.jpg';
+const transformBioSlides = (slides) => {
+  return slides.map((slide, index) => ({
+    id: slide.slide,
+    image: slide.banner_url || FALLBACK_IMAGE,
+    orientation: slide.orientation || 'landscape',
+    date: slide.date_year,
+    title: slide.heading,
+    description: slide.short_description,
+    fullDescription: slide.long_description,
+    cardClass: CARD_CLASSES[index % CARD_CLASSES.length],
+  }));
+};
 
 const BioCard = ({ event, onClick }) => (
   <div
@@ -80,7 +36,7 @@ const BioCard = ({ event, onClick }) => (
       <img
         src={event.image}
         alt={event.title}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-top"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/60" />
     </div>
@@ -106,7 +62,7 @@ const BioCard = ({ event, onClick }) => (
   </div>
 );
 
-const InfiniteMarquee = ({ onCardClick }) => {
+const InfiniteMarquee = ({ bioEvents, onCardClick }) => {
   const duplicatedEvents = [...bioEvents, ...bioEvents];
 
   return (
@@ -128,6 +84,27 @@ const InfiniteMarquee = ({ onCardClick }) => {
 
 export const HomePage = () => {
   const [selectedBio, setSelectedBio] = useState(null);
+  const [bioEvents, setBioEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBioData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/bio.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Failed to load bio.json');
+        const data = await response.json();
+        const transformedEvents = transformBioSlides(data.slides);
+        setBioEvents(transformedEvents);
+      } catch (error) {
+        console.error('Error loading bio.json:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBioData();
+  }, []);
 
   return (
     <motion.div
@@ -191,7 +168,7 @@ export const HomePage = () => {
                   {selectedBio.title}
                 </h3>
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                  {selectedBio.description}
+                  {selectedBio.fullDescription || selectedBio.description}
                 </p>
               </div>
             </motion.div>
@@ -219,7 +196,23 @@ export const HomePage = () => {
           </p>
         </motion.div>
 
-        <InfiniteMarquee onCardClick={setSelectedBio} />
+        {!loading && bioEvents.length > 0 && <InfiniteMarquee bioEvents={bioEvents} onCardClick={setSelectedBio} />}
+
+        {/* View Full Biography Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-center mt-12"
+        >
+          <a
+            href="/biography"
+            className="inline-block px-8 py-3 bg-gold/10 hover:bg-gold/20 text-gold font-bold uppercase tracking-wider rounded border border-gold/30 hover:border-gold/60 transition-all duration-300 hover:shadow-lg hover:shadow-gold/20"
+          >
+            View Full Biography
+          </a>
+        </motion.div>
       </section>
     </motion.div>
   );

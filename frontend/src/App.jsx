@@ -8,6 +8,17 @@ import { MovieDetailsPage } from './pages/MovieDetailsPage';
 import { PhotosPage } from './pages/PhotosPage';
 import { VideosCutsPage } from './pages/VideosCutsPage';
 import { VideosPage } from './pages/VideosPage';
+import { BiographyPage } from './pages/BiographyPage';
+import {
+  VideoSongsPage,
+  MovieCutsPage,
+  VideoSongsFolderPage,
+  MovieCutsFolderPage,
+  EventsPage,
+  CelebrationsPage,
+  EventsFolderPage,
+  CelebrationsFolderPage
+} from './pages/VideoCategoryPages';
 
 function App() {
   return (
@@ -20,8 +31,22 @@ function App() {
             <Route path="/movies" element={<MoviesPage />} />
             <Route path="/movies/:slug" element={<MovieDetailsPage />} />
             <Route path="/photos" element={<PhotosPage />} />
+            
+            {/* Video Cuts Hierarchy */}
             <Route path="/video-cuts" element={<VideosCutsPage />} />
+            <Route path="/video-cuts/video-songs" element={<VideoSongsPage />} />
+            <Route path="/video-cuts/video-songs/:folderName" element={<VideoSongsFolderPage />} />
+            <Route path="/video-cuts/movie-cuts" element={<MovieCutsPage />} />
+            <Route path="/video-cuts/movie-cuts/:folderName" element={<MovieCutsFolderPage />} />
+            
+            {/* Videos Hierarchy */}
             <Route path="/videos" element={<VideosPage />} />
+            <Route path="/videos/events" element={<EventsPage />} />
+            <Route path="/videos/events/:folderName" element={<EventsFolderPage />} />
+            <Route path="/videos/celebrations" element={<CelebrationsPage />} />
+            <Route path="/videos/celebrations/:folderName" element={<CelebrationsFolderPage />} />
+
+            <Route path="/biography" element={<BiographyPage />} />
             
             {/* 404 Page */}
             <Route

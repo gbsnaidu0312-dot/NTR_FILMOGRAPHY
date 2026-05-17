@@ -7,13 +7,15 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  // Hide navigation on immersive pages (home & movies) that have their own headers
-  const hiddenPaths = ['/', '/movies', '/photos', '/video-cuts', '/videos'];
-  if (hiddenPaths.includes(location.pathname)) return null;
+  // Hide navigation on immersive pages (home & movies & media sub-pages)
+  const hiddenPrefixes = ['/movies', '/photos', '/video-cuts', '/videos'];
+  const isHidden = location.pathname === '/' || hiddenPrefixes.some(prefix => location.pathname.startsWith(prefix));
+  if (isHidden) return null;
 
   const navItems = [
     { label: 'HOME', path: '/' },
     { label: 'MOVIES', path: '/movies' },
+    { label: 'BIOGRAPHY', path: '/biography' },
     { label: 'PHOTOS', path: '/photos' },
     { label: 'VIDEO CUTS', path: '/video-cuts' },
     { label: 'VIDEOS', path: '/videos' },

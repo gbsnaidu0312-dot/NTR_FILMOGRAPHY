@@ -18,7 +18,7 @@ MEDIA_PATHS = {
 }
 
 # Path to the canonical media library JSON file
-MEDIA_LIBRARY_PATH = Path(__file__).resolve().parent.parent / 'media-library.json'
+MEDIA_LIBRARY_PATH = Path(__file__).resolve().parent.parent / 'full_media_structure.json'
 
 
 def build_media_url(media_type, *path_segments):

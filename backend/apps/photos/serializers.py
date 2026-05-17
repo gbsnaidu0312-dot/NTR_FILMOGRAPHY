@@ -42,4 +42,8 @@ class PhotoFolderSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
 
     def get_photo_count(self, obj):
-        return obj.photos.count()
+        """Count direct photos + photos in immediate sub-folders."""
+        count = obj.photos.count()
+        for sub in obj.subfolders.all():
+            count += sub.photos.count()
+        return count

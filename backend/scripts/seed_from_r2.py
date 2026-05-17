@@ -144,7 +144,7 @@ def main():
     total_audio = 0
     for movie_data in MOVIES:
         movie = movie_map[movie_data['title']]
-        r2_folder = movie_data['r2_folder']
+        r2_folder = str(movie_data['r2_folder'])
         audio_files = MediaLibrary.get_audio_files(r2_folder)
 
         if not audio_files:
@@ -179,14 +179,21 @@ def main():
     total_videos = 0
 
     # Video Songs
-    for movie_data in MOVIES:
-        movie = movie_map[movie_data['title']]
-        folder = get_movie_video_song_folder(movie_data['title'])
+    for folder in MediaLibrary.get_all_video_cut_folders('Video Songs'):
         vc_files = MediaLibrary.get_video_cut_files('Video Songs', folder)
-
         if vc_files:
             found = 0
+            # Attempt to link to a movie if the folder matches
+            movie = None
+            for m_title, m_obj in movie_map.items():
+                if slugify(get_movie_video_song_folder(m_title)) == slugify(folder):
+                    movie = m_obj
+                    break
+
             for filename in vc_files:
+                if not any(filename.lower().endswith(ext) for ext in ['.mp4', '.mkv', '.webm', '.mov']):
+                    continue
+                
                 video_url = build_video_cut_url('Video Songs', folder, filename)
                 title = beautify_title(filename)
 
@@ -194,26 +201,35 @@ def main():
                     movie=movie,
                     title=title,
                     video_type='song',
+                    folder_name=folder,
                     video_url=video_url,
                     thumbnail_url=video_url,
-                    duration_seconds=240,
+                    duration_seconds=300,
                     views=0,
-                    description=f'Video song from {movie_data["title"]}',
+                    description=f'Video song from {folder}',
                 )
                 found += 1
                 total_videos += 1
 
-            print(f"  Video Songs - {movie_data['title']}: {found} songs")
+            print(f"  - Seeded {found} songs for folder: {folder}")
+
 
     # Movie Cuts
-    for movie_data in MOVIES:
-        movie = movie_map[movie_data['title']]
-        folder = get_movie_cut_folder(movie_data['title'])
+    for folder in MediaLibrary.get_all_video_cut_folders('Movie Cuts'):
         mc_files = MediaLibrary.get_video_cut_files('Movie Cuts', folder)
-
         if mc_files:
             found = 0
+            # Attempt to link to a movie if the folder matches
+            movie = None
+            for m_title, m_obj in movie_map.items():
+                if slugify(get_movie_cut_folder(m_title)) == slugify(folder):
+                    movie = m_obj
+                    break
+
             for filename in mc_files:
+                if not any(filename.lower().endswith(ext) for ext in ['.mp4', '.mkv', '.webm', '.mov']):
+                    continue
+                    
                 video_url = build_video_cut_url('Movie Cuts', folder, filename)
                 title = beautify_title(filename)
 
@@ -221,16 +237,18 @@ def main():
                     movie=movie,
                     title=title,
                     video_type='cut',
+                    folder_name=folder,
                     video_url=video_url,
                     thumbnail_url=video_url,
                     duration_seconds=180,
                     views=0,
-                    description=f'Video cut from {movie_data["title"]}',
+                    description=f'Video cut from {folder}',
                 )
                 found += 1
                 total_videos += 1
 
-            print(f"  Movie Cuts - {movie_data['title']}: {found} cuts")
+            print(f"  - Seeded {found} cuts for folder: {folder}")
+
 
     print(f"\n  Total Videos (Songs + Cuts): {total_videos}")
 
@@ -283,6 +301,9 @@ def main():
 
         # Create photo records in the deepest folder
         target_folder = parent
+        if target_folder is None:
+            continue
+            
         for i, filename in enumerate(files, 1):
             image_url = build_photo_url(*path_parts, filename=filename)
             Photo.objects.create(

@@ -284,7 +284,7 @@ MOVIES = [
         'r2_folder': 'Jai Lava Kusa',  # Audio, Photos/Movie, Movie Cuts
     },
     {
-        'title': 'Aravinda Sametha',
+        'title': 'Aravindha Sametha',
         'release_year': 2018,
         'description': 'A powerful action drama about caste-based violence in Rayalaseema. Jr. NTR plays a young man who breaks the cycle of vengeance.',
         'genre': 'Action, Drama',
@@ -313,6 +313,16 @@ MOVIES = [
         'box_office': '$100M+',
         'r2_folder': 'Devara',  # Audio, Photos/Movie, Movie Cuts, Video Songs
     },
+    {
+        'title': 'War 2',
+        'release_year': 2025,
+        'description': 'An upcoming high-octane spy thriller featuring an epic face-off.',
+        'genre': 'Action, Thriller, Spy',
+        'director': 'Ayan Mukerji',
+        'duration_minutes': 160,
+        'box_office': '',
+        'r2_folder': 'War 2',  # Audio, Photos/Movie, Movie Cuts, Video Songs
+    },
 ]
 
 # Photo folder type mapping from bucket folder names to model types
@@ -336,6 +346,8 @@ MOVIE_PHOTO_FOLDER_MAP = {
     'Yamadonga': 'YamaDonga',
     'Student No. 1': 'Student No1',
     'Ramayya Vasthavayya': 'Ramayya Vastavayya',
+    'Janatha Garage': 'JANTHA GARAGE',
+    'Nannaku Prematho': 'NANNAKU PREMATHO',
 }
 
 # Map movie titles to VideoCuts/Video Songs folder names (trailing underscores)
@@ -347,7 +359,12 @@ VIDEO_SONG_FOLDER_MAP = {
 # Map movie titles to VideoCuts/Movie Cuts folder names (trailing underscores)
 MOVIE_CUT_FOLDER_MAP = {
     'Aadi': 'Aadi_',
+    'Janatha Garage': 'JANTHA GARAGE',
+    'Nannaku Prematho': 'NANNAKU PREMATHO',
+    'Student No. 1': 'Student No1',
+    'War2': 'WAR2',
 }
+
 
 
 def get_r2_folder_for_movie(movie_title):
@@ -356,7 +373,7 @@ def get_r2_folder_for_movie(movie_title):
         'Student No. 1': 'Student No1',
         'Yamadonga': 'YamaDonga',
         'Ramayya Vasthavayya': 'Ramayya Vastavayya',
-        'Aravinda Sametha': 'Aravinda Sametha',
+        'Aravindha Sametha': 'Aravinda Sametha',
     }
     return special_cases.get(movie_title, movie_title)
 

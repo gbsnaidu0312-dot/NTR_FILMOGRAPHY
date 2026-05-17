@@ -10,7 +10,16 @@ from apps.photos.serializers import PhotoFolderSerializer, PhotoFolderDetailSeri
 
 class PhotoFolderViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    ViewSet for PhotoFolder model
+    ViewSet for PhotoFolder model.
+
+    When ?type=movie or ?type=event is requested, the DB stores a single root
+    "Movie" / "Event" wrapper folder (parent_folder=None) with all movie/event
+    folders as its children.  The root wrapper itself has 0 direct photos, so
+    we skip it and return the children directly so the frontend sees Aadi,
+    Ashok, ADDS, AWARDS … with real photo counts.
+
+    For ?type=offline the photos sit directly in the root Offline folder, so
+    we keep the old root-only behaviour.
     """
     queryset = PhotoFolder.objects.filter(parent_folder__isnull=True)
     lookup_field = 'slug'
@@ -25,8 +34,33 @@ class PhotoFolderViewSet(viewsets.ReadOnlyModelViewSet):
         return PhotoFolderSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        # Allow retrieving any folder by slug, otherwise subfolders return 404
+        if self.action in ['retrieve', 'subfolders']:
+            return PhotoFolder.objects.all()
+
         folder_type = self.request.query_params.get('type', None)
+
+        if folder_type in ('movie', 'event'):
+            # Skip the wrapper root folder; return its children directly.
+            # The root wrapper is: parent_folder=None, folder_type=folder_type, name='Movie'/'Event'
+            root_folders = PhotoFolder.objects.filter(
+                parent_folder__isnull=True,
+                folder_type=folder_type,
+            )
+            if root_folders.exists():
+                # Return all direct children of those root folders
+                return PhotoFolder.objects.filter(
+                    parent_folder__in=root_folders,
+                    folder_type=folder_type,
+                ).order_by('name')
+            # Fallback: no wrapper exists, return root-level folders as before
+            return PhotoFolder.objects.filter(
+                parent_folder__isnull=True,
+                folder_type=folder_type,
+            ).order_by('name')
+
+        # offline (or no type filter): keep original root-only queryset
+        queryset = PhotoFolder.objects.filter(parent_folder__isnull=True)
         if folder_type:
             queryset = queryset.filter(folder_type=folder_type)
         return queryset

@@ -18,6 +18,8 @@ class AudioSong(TimestampedModel):
     plays = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
+    objects = models.Manager()
+
     class Meta:
         ordering = ['track_number']
         unique_together = ('movie', 'track_number')
