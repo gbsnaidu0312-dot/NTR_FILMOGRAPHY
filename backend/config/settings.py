@@ -3,10 +3,12 @@ pymysql.install_as_MySQLdb()
 
 """
 NTR Filmography Backend - Django Configuration
+Production-ready: reads DATABASE_URL, DEBUG, ALLOWED_HOSTS from env.
 """
 import os
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
+import dj_database_url
 
 from config.media_config import MEDIA_BASE_URL
 
@@ -16,9 +18,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='ntr-filmography-dev-secret-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0').split(',')
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,0.0.0.0,.railway.app,.ntrfilmography.live',
+    cast=Csv()
+)
 
 # Application definition
 INSTALLED_APPS = [
@@ -39,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,27 +75,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database Configuration - MySQL
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': config('DB_NAME', default='ntr_filmography'),
-#         'USER': config('DB_USER', default='root'),
-#         'PASSWORD': config('DB_PASSWORD', default=''),
-#         'HOST': config('DB_HOST', default='localhost'),
-#         'PORT': config('DB_PORT', default='3306'),
-#         'CHARSET': 'utf8mb4',
-#         'COLLATION': 'utf8mb4_unicode_ci',
-#     }
-# }
+# ── Database Configuration ────────────────────────────────────────────────
+# Production (Railway): set DATABASE_URL env var, e.g.
+#   mysql://user:pass@host:3306/dbname
+# Development: falls back to local SQLite if DATABASE_URL not set
+DATABASE_URL = config('DATABASE_URL', default='')
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-}
+    # Ensure utf8mb4 if MySQL
+    if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['charset'] = 'utf8mb4'
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -104,38 +111,35 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# ── Static files (CSS, JavaScript, Images) ────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Cloudflare R2 Configuration
 USE_CLOUDFLARE_R2 = config('USE_CLOUDFLARE_R2', default=False, cast=bool)
 
 if USE_CLOUDFLARE_R2:
-    # Cloudflare R2 Storage Configuration
     CLOUDFLARE_R2_ACCESS_KEY_ID = config('CLOUDFLARE_R2_ACCESS_KEY_ID', default='')
     CLOUDFLARE_R2_SECRET_ACCESS_KEY = config('CLOUDFLARE_R2_SECRET_ACCESS_KEY', default='')
     CLOUDFLARE_R2_BUCKET = config('CLOUDFLARE_R2_BUCKET', default='ntr-filmography')
     CLOUDFLARE_R2_ENDPOINT = config('CLOUDFLARE_R2_ENDPOINT', default='')
     CLOUDFLARE_R2_CUSTOM_DOMAIN = config('CLOUDFLARE_R2_CUSTOM_DOMAIN', default='')
-    
-    # Use Cloudflare R2 for media storage
+
     STORAGES = {
         'default': {'BACKEND': 'config.storage.MediaStorage'},
-        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
     }
-    
-    # Media URL from centralized config
+
     MEDIA_URL = MEDIA_BASE_URL + '/'
 else:
-    # Local storage (development)
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework Configuration
+# ── Django REST Framework ─────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
@@ -148,13 +152,29 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173').split(',')
-
+# ── CORS Configuration ────────────────────────────────────────────────────
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173,https://ntrfilmography.live,https://www.ntrfilmography.live,https://ntrfilmography.pages.dev',
+    cast=Csv()
+)
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF trusted origins (required for Django 4+ when behind HTTPS proxy)
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://ntrfilmography.live,https://www.ntrfilmography.live,https://*.railway.app,https://ntrfilmography.pages.dev',
+    cast=Csv()
+)
 
-# Logging
+# ── Security (only enforce when not in DEBUG) ─────────────────────────────
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# ── Logging ───────────────────────────────────────────────────────────────
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
