@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { videosApi } from '../services/api';
 import { getR2Url } from '../config/links';
+import ntrBg from '../assets/NTR.jpg';
 import { VideoGridPlayer } from '../components/VideoGridPlayer';
 import { ErrorBoundary } from '../components/Common';
 
@@ -34,7 +35,7 @@ export const VideoFolderDetailPage = ({ videoType, backPath, titlePrefix }) => {
       animate={{ opacity: 1 }}
       className="min-h-screen bg-dark relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${getR2Url('/wp5283563.jpg')})` }} />
+      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${ntrBg})` }} />
       <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark/95 to-dark" />
 
       <div className="relative z-10 min-h-screen flex flex-col">

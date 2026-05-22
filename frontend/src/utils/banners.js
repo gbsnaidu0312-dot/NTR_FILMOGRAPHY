@@ -2,63 +2,14 @@ import { getR2Url } from '../config/links';
 import TigerIcon from '../assets/Tigericon.jpg';
 
 /**
- * Banner mapping for NTR Filmography.
- * Dynamically fetches from Cloudflare R2 bucket instead of local files.
- * 
- * Assumes you will upload files to R2 in a `/banners/` folder like:
- *   /banners/{slug}-landscape.jpg
- *   /banners/{slug}-portrait.jpg
- */
-
-/**
- * Get the landscape (hero background) banner URL for a movie.
+ * Map known movie names/slugs (lowercase, trimmed) → portrait filename in THUMBNAIL_P/
+ * Also used to derive landscape filenames (same name + _L suffix).
  *
- * @param {Object} movie  — movie object from the API
- * @returns {string}
+ * R2 structure:
+ *   Portrait  → THUMBNAIL_P/{filename}        e.g. THUMBNAIL_P/AADI.png
+ *   Landscape → THUMBNAILS/{name}_L.png       e.g. THUMBNAILS/AADI_L.png
  */
-export function getLandscapeBanner(movie) {
-  if (!movie) return '/tiger-nation-logo-landscape.jpg';
-  
-  // If the backend has a specific banner_url (and it's not the old default placeholder), use it
-  if (movie.banner_url && !movie.banner_url.includes('wp5283563.jpg')) {
-    return movie.banner_url;
-  }
-
-  // Otherwise, fallback to the new R2 folder structure using the slug
-  if (movie.slug) {
-    return getR2Url(`/banners/${movie.slug}-landscape.jpg`);
-  }
-  
-  return '/tiger-nation-logo-landscape.jpg';
-}
-
-/**
- * Get the portrait (sidebar thumbnail) banner URL for a movie.
- *
- * @param {Object} movie  — movie object from the API
- * @returns {string}
- */
-export function getPortraitBanner(movie) {
-  if (!movie) return '/tiger-nation-logo-portrait.jpg';
-  
-  // If the backend has a specific poster_url (and it's not the old default placeholder), use it
-  if (movie.poster_url && !movie.poster_url.includes('wp5283563.jpg')) {
-    return movie.poster_url;
-  }
-
-  // Otherwise, fallback to the new R2 folder structure using the slug
-  if (movie.slug) {
-    return getR2Url(`/banners/${movie.slug}-portrait.jpg`);
-  }
-  
-  return '/tiger-nation-logo-portrait.jpg';
-}
-
-/**
- * Map known folder names (lowercase, trimmed) to their exact portrait filename.
- * If a folder matches a movie, we use its poster.
- */
-const FOLDER_TO_POSTER_MAP = {
+const MOVIE_TO_POSTER_MAP = {
   'ninnu choodalani': 'NINNU CHUDALANI.png',
   'student no1': 'STUDENT No1.png',
   'student no. 1': 'STUDENT No1.png',
@@ -100,25 +51,93 @@ const FOLDER_TO_POSTER_MAP = {
   'war 2': 'WAR2.png',
 };
 
+// Keep old name for backward compatibility (used by getFolderThumbnail callers)
+const FOLDER_TO_POSTER_MAP = MOVIE_TO_POSTER_MAP;
+
+/** Encode a filename for use in an R2 URL (spaces → %20) */
+function encodeR2(filename) {
+  return filename.replace(/ /g, '%20');
+}
+
+/** Returns true if a URL is a known placeholder (should be ignored) */
+function isPlaceholder(url) {
+  if (!url) return true;
+  return url.includes('wp5283563.jpg') || url.includes('sample/79');
+}
+
+/** Look up a movie by title or slug in MOVIE_TO_POSTER_MAP */
+function lookupMovieKey(movie) {
+  if (!movie) return null;
+  const byTitle = movie.title?.toLowerCase().trim();
+  const bySlug  = movie.slug?.toLowerCase().trim()?.replace(/-/g, ' ');
+  return MOVIE_TO_POSTER_MAP[byTitle] ? byTitle
+       : MOVIE_TO_POSTER_MAP[bySlug]  ? bySlug
+       : null;
+}
+
 /**
- * Get the portrait thumbnail URL for a folder.
- * Uses THUMBNAIL_P bucket files for movies, or Tigericon.jpg for non-movies.
- *
- * @param {string} folderName  — folder name from API
- * @returns {string}
+ * Get the landscape (hero background) banner URL for a movie.
+ * R2 path: /THUMBNAILS/{NAME}_L.png
+ * e.g. https://pub-xxx.r2.dev/THUMBNAILS/AADI_L.png
+ */
+export function getLandscapeBanner(movie) {
+  if (!movie) return '/tiger-nation-logo-landscape.jpg';
+
+  // Use backend URL only if it's a real (non-placeholder) URL
+  if (!isPlaceholder(movie.banner_url)) {
+    return movie.banner_url;
+  }
+
+  // Derive from MOVIE_TO_POSTER_MAP: portrait name + _L suffix → THUMBNAILS folder
+  const key = lookupMovieKey(movie);
+  if (key) {
+    const portraitFile  = MOVIE_TO_POSTER_MAP[key];               // e.g. "AADI.png"
+    const landscapeFile = portraitFile.replace('.png', '_L.png'); // e.g. "AADI_L.png"
+    return getR2Url(`/THUMBNAILS/${encodeR2(landscapeFile)}`);
+  }
+
+  return '/tiger-nation-logo-landscape.jpg';
+}
+
+/**
+ * Get the portrait (sidebar / card) thumbnail URL for a movie.
+ * R2 path: /THUMBNAIL_P/{NAME}.png
+ * e.g. https://pub-xxx.r2.dev/THUMBNAIL_P/AADI.png
+ */
+export function getPortraitBanner(movie) {
+  if (!movie) return '/tiger-nation-logo-portrait.jpg';
+
+  // Use backend URL only if it's a real (non-placeholder) URL
+  if (!isPlaceholder(movie.poster_url)) {
+    return movie.poster_url;
+  }
+
+  // Look up portrait filename from map → THUMBNAIL_P folder
+  const key = lookupMovieKey(movie);
+  if (key) {
+    const portraitFile = MOVIE_TO_POSTER_MAP[key]; // e.g. "AADI.png"
+    return getR2Url(`/THUMBNAIL_P/${encodeR2(portraitFile)}`);
+  }
+
+  return '/tiger-nation-logo-portrait.jpg';
+}
+
+/**
+ * Get the portrait thumbnail URL for a photo folder card.
+ * Uses THUMBNAIL_P/{NAME}.png from R2 for known movie folders,
+ * falls back to TigerIcon for non-movie folders.
  */
 export function getFolderThumbnail(folderName) {
   if (!folderName) return TigerIcon;
 
-  // Case-insensitive trimmed lookup
   const key = folderName.toLowerCase().trim();
   const filename = FOLDER_TO_POSTER_MAP[key];
   if (filename) {
-    // encodeURIComponent handles spaces but leaves other things, safer to just replace spaces for R2
-    const encodedFilename = filename.replace(/ /g, '%20');
-    return `https://ntrfilmography.live/THUMBNAIL_P/${encodedFilename}`;
+    return getR2Url(`/THUMBNAIL_P/${encodeR2(filename)}`);
   }
 
-  // Fallback for non-movie folders
   return TigerIcon;
 }
+
+// Re-export for any legacy imports
+export { FOLDER_TO_POSTER_MAP };

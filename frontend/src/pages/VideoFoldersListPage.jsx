@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { videosApi } from '../services/api';
 import { getR2Url } from '../config/links';
+import ntrBg from '../assets/NTR.jpg';
 import { getFolderThumbnail } from '../utils/banners';
 import { LoadingSpinner, EmptyState } from '../components/Common';
 
@@ -109,7 +110,7 @@ export const VideoFoldersListPage = ({ videoType, title, subtitle, backPath, fol
       className="min-h-screen bg-dark relative overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${getR2Url('/wp5283563.jpg')})` }} />
+      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${ntrBg})` }} />
       <div className="absolute inset-0 bg-gradient-to-b from-dark via-dark/95 to-dark" />
 
       <div className="relative z-10 min-h-screen">

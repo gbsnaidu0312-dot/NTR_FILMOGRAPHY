@@ -7,6 +7,7 @@ import { LoadingSpinner, ErrorBoundary, EmptyState } from '../components/Common'
 import { FilmReelIcon, CalendarStarIcon, FolderIcon, CameraIcon } from '../assets/icons';
 import { getR2Url } from '../config/links';
 import { getFolderThumbnail } from '../utils/banners';
+import ntrBg from '../assets/NTR.jpg';
 
 // Grid view icons
 const GridLargeIcon = () => (
@@ -300,7 +301,7 @@ export const PhotosPage = () => {
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${getR2Url('/wp5283563.jpg')})` }}
+        style={{ backgroundImage: `url(${ntrBg})` }}
       />
       <div className="absolute inset-0 bg-dark/85" />
 

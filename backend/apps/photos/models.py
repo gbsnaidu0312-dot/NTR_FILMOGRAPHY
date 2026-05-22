@@ -36,9 +36,15 @@ class PhotoFolder(TimestampedModel):
         return str(self.name)
 
     def save(self, *args, **kwargs):
+        from django.utils.text import slugify  # type: ignore
         if not self.slug:
-            from django.utils.text import slugify  # type: ignore
             self.slug = str(slugify(str(self.name)))  # type: ignore
+        if not self.path:
+            # Auto-generate path from folder hierarchy: parent/name
+            if self.parent_folder and self.parent_folder.path:
+                self.path = f"{self.parent_folder.path}/{self.name}"
+            else:
+                self.path = self.name
         super().save(*args, **kwargs)
 
 

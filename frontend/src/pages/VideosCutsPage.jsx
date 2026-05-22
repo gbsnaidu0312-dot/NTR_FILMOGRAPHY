@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ClapperboardIcon, PlayIcon } from '../assets/icons';
 import { getR2Url } from '../config/links';
+import ntrBg from '../assets/NTR.jpg';
 
 const categories = [
   {
@@ -44,7 +45,7 @@ export const VideosCutsPage = () => {
       className="min-h-screen bg-dark relative overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${getR2Url('/wp5283563.jpg')})` }} />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${ntrBg})` }} />
       <div className="absolute inset-0 bg-black/82 backdrop-blur-[2px]" />
 
       {/* Content */}
