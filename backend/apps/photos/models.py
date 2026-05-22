@@ -15,7 +15,7 @@ class PhotoFolder(TimestampedModel):
     ]
 
     name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
     folder_type = models.CharField(max_length=20, choices=FOLDER_TYPE_CHOICES)
     path = models.CharField(max_length=500, blank=True, help_text='Full relative path from Photos root (e.g. Event/ADDS/Appy fizz)')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='photo_folders', null=True, blank=True)
