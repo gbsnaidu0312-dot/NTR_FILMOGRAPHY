@@ -2,11 +2,17 @@
 NTR Filmography - Centralized Media Path Configuration
 Single source of truth for all media base paths and URL construction.
 """
+import os
 from pathlib import Path
 from urllib.parse import quote
 
-# Base URL for all media (hosted on Cloudflare R2 with custom domain)
-MEDIA_BASE_URL = 'https://ntrfilmography.live'
+# Base URL for all media (Cloudflare R2 public URL)
+# Set MEDIA_BASE_URL env var in Railway to override.
+# Default: the R2 public bucket URL (works everywhere).
+MEDIA_BASE_URL = os.environ.get(
+    'MEDIA_BASE_URL',
+    'https://pub-4b8805119f7f49ae848fa1aaa57dd6d0.r2.dev'
+)
 
 # Media type path prefixes (matching R2 bucket folder structure on the custom domain)
 MEDIA_PATHS = {
