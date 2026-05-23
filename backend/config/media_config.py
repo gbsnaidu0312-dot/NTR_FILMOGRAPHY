@@ -66,6 +66,24 @@ def build_video_url(category, folder, filename):
     return build_media_url('videos', category, folder, filename)
 
 
+def build_portrait_url(filename):
+    """Build portrait thumbnail URL: /THUMBNAIL_P/{filename}
+    e.g. https://ntrfilmography.live/THUMBNAIL_P/AADI.png
+    """
+    encoded = quote(filename, safe='')
+    return f'{MEDIA_BASE_URL}/THUMBNAIL_P/{encoded}'
+
+
+def build_landscape_url(filename):
+    """Build landscape banner URL: /THUMBNAILS/{name}_L.png
+    e.g. https://ntrfilmography.live/THUMBNAILS/AADI_L.png
+    Accepts the portrait filename (AADI.png) and converts to landscape (_L.png).
+    """
+    landscape_file = filename.replace('.png', '_L.png')
+    encoded = quote(landscape_file, safe='')
+    return f'{MEDIA_BASE_URL}/THUMBNAILS/{encoded}'
+
+
 def build_root_file_url(filename):
     """Build URL for a file at the bucket root (e.g. poster, banner images).
 

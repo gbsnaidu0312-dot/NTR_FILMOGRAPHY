@@ -5,9 +5,45 @@ Base URLs are managed centrally in config.media_config - do NOT add them here.
 """
 from django.utils.text import slugify
 
-# Default poster/banner filenames (will be replaced when user uploads banners later)
+# Default poster/banner filenames (fallback only)
 DEFAULT_POSTER_FILENAME = 'wp5283563.jpg'
 DEFAULT_BANNER_FILENAME = 'wp5283563.jpg'
+
+# Maps each movie title → portrait thumbnail filename in R2 THUMBNAIL_P/ folder.
+# Landscape banner = same name + _L suffix in THUMBNAILS/ folder.
+MOVIE_POSTER_FILENAMES = {
+    'Ninnu Choodalani':   'NINNU CHUDALANI.png',
+    'Student No. 1':      'STUDENT No1.png',
+    'Subbu':              'SUBBU.png',
+    'Aadi':               'AADI.png',
+    'Allari Ramudu':      'ALLARI RAMUDU.png',
+    'Naaga':              'NAAGA.png',
+    'Simhadri':           'SIMHADRI.png',
+    'Andhrawala':         'ANDHRAWALA.png',
+    'Samba':              'SAMBA.png',
+    'Naa Alludu':         'NAA ALLUDU.png',
+    'Narasimhudu':        'NARASIMHUDU.png',
+    'Ashok':              'ASHOK.png',
+    'Rakhi':              'RAKHI.png',
+    'Yamadonga':          'YAMADONGA.png',
+    'Kantri':             'KANTRI.png',
+    'Adhurs':             'Adhurs.png',
+    'Brindavanam':        'BRINDHAVANAM.png',
+    'Shakti':             'SHAKTI.png',
+    'Oosaravelli':        'Oosaravalli.png',
+    'Dhammu':             'DHAMMU.png',
+    'Baadshah':           'BAADSHAH.png',
+    'Ramayya Vasthavayya':'RAMAYYA VASTAVAYYA.png',
+    'Rabhasa':            'RABASA.png',
+    'Temper':             'TEMPER.png',
+    'Nannaku Prematho':   'NKP.png',
+    'Janatha Garage':     'JANATAGARAGE.png',
+    'Jai Lava Kusa':      'JAI LAVAKUSA.png',
+    'Aravindha Sametha':  'ARAVINDA SAMETHA.png',
+    'RRR':                'RRR.png',
+    'Devara':             'DEVARA.png',
+    'War 2':              'WAR2.png',
+}
 
 # Complete Jr. NTR filmography with R2 folder name mapping
 # r2_folder: the exact folder name as it appears in R2 bucket Audio/ paths

@@ -34,6 +34,7 @@ from scripts.movie_data import (
     MOVIES,
     MOVIE_PHOTO_FOLDER_MAP, VIDEO_SONG_FOLDER_MAP, MOVIE_CUT_FOLDER_MAP,
     PHOTO_TYPES, DEFAULT_POSTER_FILENAME, DEFAULT_BANNER_FILENAME,
+    MOVIE_POSTER_FILENAMES,
 )
 
 # Import media library and URL builders
@@ -41,6 +42,7 @@ from apps.core.utils.media_library import MediaLibrary
 from config.media_config import (
     build_audio_url, build_movie_url, build_photo_url,
     build_video_cut_url, build_video_url, build_root_file_url,
+    build_portrait_url, build_landscape_url,
 )
 
 
@@ -111,12 +113,21 @@ def main():
     movie_files = MediaLibrary.get_movie_files()
     print(f"  Found {len(movie_files)} movie files in media library")
 
-    poster_url = build_root_file_url(DEFAULT_POSTER_FILENAME)
-    banner_url = build_root_file_url(DEFAULT_BANNER_FILENAME)
+    fallback_poster_url = build_root_file_url(DEFAULT_POSTER_FILENAME)
+    fallback_banner_url = build_root_file_url(DEFAULT_BANNER_FILENAME)
 
     for movie_data in MOVIES:
         movie_filename = find_movie_file(movie_data['title'], movie_files)
         movie_url = build_movie_url(movie_filename) if movie_filename else None
+
+        # Use real R2 thumbnail URLs if available, otherwise fall back to placeholder
+        poster_file = MOVIE_POSTER_FILENAMES.get(movie_data['title'])
+        if poster_file:
+            poster_url = build_portrait_url(poster_file)
+            banner_url = build_landscape_url(poster_file)
+        else:
+            poster_url = fallback_poster_url
+            banner_url = fallback_banner_url
 
         movie, created = Movie.objects.update_or_create(
             title=movie_data['title'],
