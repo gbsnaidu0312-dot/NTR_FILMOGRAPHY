@@ -51,6 +51,12 @@ const MOVIE_TO_POSTER_MAP = {
   'war 2': 'WAR2.png',
 };
 
+// Landscape filename overrides — only needed when R2 landscape name ≠ portrait_name + _L
+const MOVIE_LANDSCAPE_OVERRIDE = {
+  'aravinda sametha':  'Aravindha Sametha_L.png',
+  'aravindha sametha': 'Aravindha Sametha_L.png',
+};
+
 // Keep old name for backward compatibility (used by getFolderThumbnail callers)
 const FOLDER_TO_POSTER_MAP = MOVIE_TO_POSTER_MAP;
 
@@ -91,8 +97,8 @@ export function getLandscapeBanner(movie) {
   // Derive from MOVIE_TO_POSTER_MAP: portrait name + _L suffix → THUMBNAILS folder
   const key = lookupMovieKey(movie);
   if (key) {
-    const portraitFile  = MOVIE_TO_POSTER_MAP[key];               // e.g. "AADI.png"
-    const landscapeFile = portraitFile.replace('.png', '_L.png'); // e.g. "AADI_L.png"
+    const portraitFile  = MOVIE_TO_POSTER_MAP[key];
+    const landscapeFile = MOVIE_LANDSCAPE_OVERRIDE[key] || portraitFile.replace('.png', '_L.png');
     return getR2Url(`/THUMBNAILS/${encodeR2(landscapeFile)}`);
   }
 

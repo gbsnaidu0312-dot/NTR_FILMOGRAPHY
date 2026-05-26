@@ -20,7 +20,14 @@ export const MoviesPage = () => {
   const [audioOpen, setAudioOpen] = useState(false);
   const [playMovie, setPlayMovie] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchMovies();
@@ -139,7 +146,39 @@ export const MoviesPage = () => {
       animate={{ opacity: 1 }}
       className="min-h-screen bg-dark flex"
     >
-      {/* Filmstrip Sidebar - Resizable */}
+      {/* ── MOBILE: Floating compact pill sidebar ── */}
+      {isMobile && (
+        <div className="fixed left-3 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2 bg-black/80 backdrop-blur-md rounded-2xl py-3 px-1.5 border border-white/10 shadow-2xl overflow-y-auto scrollbar-hide max-h-[80vh]">
+          {movies.map((movie, i) => (
+            <button
+              key={movie.id}
+              onClick={() => setSelectedIndex(i)}
+              className="relative flex flex-col items-center group"
+            >
+              {/* Active indicator bar */}
+              {i === selectedIndex && (
+                <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-1 h-8 bg-amber-400 rounded-full" />
+              )}
+              <div
+                className={`w-11 h-11 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+                  i === selectedIndex
+                    ? 'border-amber-400 shadow-lg shadow-amber-400/40 scale-110'
+                    : 'border-white/10 opacity-50 hover:opacity-80 hover:border-white/30'
+                }`}
+              >
+                <img
+                  src={getPortraitBanner(movie)}
+                  alt={movie.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── DESKTOP: Filmstrip Sidebar - Resizable ── */}
+      {!isMobile && (
       <div
         ref={sidebarRef}
         className="fixed left-0 top-0 bottom-0 z-30 flex flex-col bg-black/95 border-r border-gold/10 overflow-y-auto scrollbar-hide"
@@ -196,9 +235,13 @@ export const MoviesPage = () => {
           ))}
         </div>
       </div>
+      )} {/* end desktop sidebar */}
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide" style={{ marginLeft: `${sidebarWidth}px` }}>
+      <div
+        className="flex-1 overflow-y-auto scrollbar-hide"
+        style={{ marginLeft: isMobile ? 0 : `${sidebarWidth}px` }}
+      >
         <AnimatePresence mode="wait">
           {selectedMovie && (
             <motion.div
@@ -224,7 +267,7 @@ export const MoviesPage = () => {
                 </motion.button>
 
                 {/* Left: Movie Info */}
-                <div className="relative z-10 flex flex-col justify-center p-6 md:p-12 w-full md:w-[40%] lg:w-1/3">
+                <div className="relative z-10 flex flex-col justify-center pl-20 pr-6 py-6 md:p-12 w-full md:w-[40%] lg:w-1/3">
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -250,7 +293,7 @@ export const MoviesPage = () => {
                     </p>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-3">
                       <button
                         onClick={() => {
                           if (selectedMovie?.movie_url) {

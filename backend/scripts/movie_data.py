@@ -45,6 +45,12 @@ MOVIE_POSTER_FILENAMES = {
     'War 2':              'WAR2.png',
 }
 
+# Overrides for movies where the landscape filename in R2 differs from portrait_name + _L.
+# Only add entries here when the landscape file has a different name than {portrait}_L.png
+MOVIE_LANDSCAPE_FILENAMES = {
+    'Aravindha Sametha': 'Aravindha Sametha_L.png',
+}
+
 # Complete Jr. NTR filmography with R2 folder name mapping
 # r2_folder: the exact folder name as it appears in R2 bucket Audio/ paths
 # Note: Some folders have trailing underscores, different casing, or alternate spellings

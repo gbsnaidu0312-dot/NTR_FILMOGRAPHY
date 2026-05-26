@@ -34,7 +34,7 @@ from scripts.movie_data import (
     MOVIES,
     MOVIE_PHOTO_FOLDER_MAP, VIDEO_SONG_FOLDER_MAP, MOVIE_CUT_FOLDER_MAP,
     PHOTO_TYPES, DEFAULT_POSTER_FILENAME, DEFAULT_BANNER_FILENAME,
-    MOVIE_POSTER_FILENAMES,
+    MOVIE_POSTER_FILENAMES, MOVIE_LANDSCAPE_FILENAMES,
 )
 
 # Import media library and URL builders
@@ -124,7 +124,8 @@ def main():
         poster_file = MOVIE_POSTER_FILENAMES.get(movie_data['title'])
         if poster_file:
             poster_url = build_portrait_url(poster_file)
-            banner_url = build_landscape_url(poster_file)
+            landscape_file = MOVIE_LANDSCAPE_FILENAMES.get(movie_data['title'], poster_file)
+            banner_url = build_landscape_url(landscape_file)
         else:
             poster_url = fallback_poster_url
             banner_url = fallback_banner_url
