@@ -1,22 +1,35 @@
 /**
  * Force-download a file from a URL.
- * Uses fetch + blob so the browser saves it instead of opening in a new tab.
- * Falls back gracefully if CORS or network errors occur.
  *
- * @param {string} url      - Full URL of the file to download
+ * For R2 cross-origin URLs the browser ignores the `download` attribute and
+ * loading a 2 GB file into a Blob is not feasible.  Instead we route through
+ * the /download Cloudflare Pages Function which:
+ *   1. Fetches the file from R2 at the edge (fast, no memory issue)
+ *   2. Adds `Content-Disposition: attachment` so the browser always saves it
+ *   3. Forwards Range headers so large downloads are resumable
+ *
+ * In local development the Vite dev-server doesn't have the CF Function, so
+ * we fall back to a plain anchor click (opens the file; use `wrangler pages dev`
+ * locally if you need to test the full flow).
+ *
+ * @param {string} url      - Full URL of the file (R2 or any absolute URL)
  * @param {string} filename - Suggested filename for the saved file
  */
-export async function downloadFile(url, filename) {
-  try {
-    const response = await fetch(url, { mode: 'cors' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    triggerDownload(blobUrl, filename);
-    URL.revokeObjectURL(blobUrl);
-  } catch (err) {
-    console.warn('Blob download failed, trying direct link:', err);
-    // Fallback: direct anchor download (works if same-origin or CORS allows it)
+export function downloadFile(url, filename) {
+  const isR2 = url.startsWith('https://pub-4b8805119f7f49ae848fa1aaa57dd6d0.r2.dev/');
+  const isDev = import.meta.env.DEV;
+
+  if (isR2 && !isDev) {
+    // Route through the same-origin CF Pages Function proxy.
+    // Same-origin means: (a) no CORS issues, (b) `download` attribute is
+    // honoured by the browser, (c) the native download manager streams the
+    // file — no memory spike regardless of file size.
+    const proxy = `/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+    triggerDownload(proxy, filename);
+  } else {
+    // Local dev or non-R2 URL: plain anchor click.
+    // For R2 URLs in dev this navigates to the file (opens / plays it) which
+    // is good enough for development testing.
     triggerDownload(url, filename);
   }
 }
