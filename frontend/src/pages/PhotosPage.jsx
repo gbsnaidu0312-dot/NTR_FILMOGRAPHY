@@ -8,6 +8,7 @@ import { FilmReelIcon, CalendarStarIcon, FolderIcon, CameraIcon } from '../asset
 import { getR2Url } from '../config/links';
 import { getFolderThumbnail } from '../utils/banners';
 import ntrBg from '../assets/NTR.jpg';
+import { downloadFile } from '../utils/download';
 
 // Grid view icons
 const GridLargeIcon = () => (
@@ -214,12 +215,9 @@ export const PhotosPage = () => {
   const handleDownload = () => {
     const photo = photos[selectedPhotoIndex];
     if (photo?.image_url) {
-      const link = document.createElement('a');
-      link.href = photo.image_url;
-      link.download = photo.caption || 'photo.jpg';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const ext = photo.image_url.split('.').pop().split('?')[0] || 'jpg';
+      const name = (photo.caption || 'photo').replace(/[^a-z0-9_\- ]/gi, '_');
+      downloadFile(photo.image_url, `${name}.${ext}`);
     }
   };
 

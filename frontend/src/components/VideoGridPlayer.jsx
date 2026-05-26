@@ -9,6 +9,7 @@ import { LoadingSpinner, EmptyState, VideoPlayer } from './Common';
 import { getR2Url } from '../config/links';
 import { getFolderThumbnail } from '../utils/banners';
 import TigerIcon from '../assets/Tigericon.jpg';
+import { downloadFile } from '../utils/download';
 
 // Helper to check if a URL points to a video file
 const isVideoLink = (url) => {
@@ -316,10 +317,8 @@ export const VideoGridPlayer = ({ videos, loading, folderName }) => {
   const handleDownload = () => {
     const v = videos[selectedIdx];
     if (v?.video_url) {
-      const a = document.createElement('a');
-      a.href = v.video_url;
-      a.download = v.title || 'video';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      const ext = v.video_url.split('.').pop().split('?')[0] || 'mp4';
+      downloadFile(v.video_url, `${v.title || 'video'}.${ext}`);
     }
   };
 

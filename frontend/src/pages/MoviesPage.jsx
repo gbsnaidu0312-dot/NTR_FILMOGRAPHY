@@ -6,6 +6,7 @@ import { formatDuration } from '../utils/helpers';
 import { LoadingSpinner, ErrorBoundary } from '../components/Common';
 import { getR2Url } from '../config/links';
 import { getLandscapeBanner, getPortraitBanner } from '../utils/banners';
+import { downloadFile } from '../utils/download';
 
 export const MoviesPage = () => {
   const navigate = useNavigate();
@@ -103,25 +104,10 @@ export const MoviesPage = () => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!selectedMovie?.movie_url) return;
-    try {
-      const response = await fetch(selectedMovie.movie_url);
-      if (!response.ok) throw new Error('Download failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${selectedMovie.title}.mkv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Download error:', err);
-      // Fallback: open in new tab if blob download fails
-      window.open(selectedMovie.movie_url, '_blank');
-    }
+    const ext = selectedMovie.movie_url.split('.').pop().split('?')[0] || 'mkv';
+    downloadFile(selectedMovie.movie_url, `${selectedMovie.title}.${ext}`);
   };
 
   const handleShare = async () => {
