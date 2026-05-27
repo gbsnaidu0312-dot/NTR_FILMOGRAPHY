@@ -59,11 +59,6 @@ const ShareIcon = () => (
   </svg>
 );
 
-const HeartIcon = ({ filled }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-  </svg>
-);
 
 const PhotoFolderCard = ({ folder, index, onClick }) => {
   const [imgError, setImgError] = React.useState(false);
@@ -120,7 +115,7 @@ export const PhotosPage = () => {
   const [error, setError] = useState(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [gridView, setGridView] = useState('medium'); // 'large', 'medium', 'compact'
-  const [likedPhotos, setLikedPhotos] = useState(new Set());
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     if (activeType) {
@@ -200,17 +195,6 @@ export const PhotosPage = () => {
     }
   };
 
-  const toggleLike = (photoId) => {
-    setLikedPhotos((prev) => {
-      const next = new Set(prev);
-      if (next.has(photoId)) {
-        next.delete(photoId);
-      } else {
-        next.add(photoId);
-      }
-      return next;
-    });
-  };
 
   const handleDownload = () => {
     const photo = photos[selectedPhotoIndex];
@@ -222,24 +206,12 @@ export const PhotosPage = () => {
   };
 
   const handleShare = async () => {
-    const photo = photos[selectedPhotoIndex];
-    if (navigator.share && photo) {
-      try {
-        await navigator.share({
-          title: photo.caption,
-          text: `Check out this photo: ${photo.caption}`,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log('Share cancelled');
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
-      } catch (err) {
-        console.error('Failed to copy');
-      }
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy');
     }
   };
 
@@ -394,25 +366,10 @@ export const PhotosPage = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleShare}
-                    className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white text-xs md:text-sm transition-all"
+                    className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-all ${shareCopied ? 'bg-amber-400/20 text-amber-400' : 'bg-white/10 hover:bg-white/20 text-white'}`}
                   >
                     <ShareIcon />
-                    <span className="hidden sm:inline">Share</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => currentPhoto && toggleLike(currentPhoto.id)}
-                    className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm transition-all ${
-                      currentPhoto && likedPhotos.has(currentPhoto.id)
-                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                        : 'bg-white/10 text-white hover:bg-white/20'
-                    }`}
-                  >
-                    <HeartIcon filled={currentPhoto && likedPhotos.has(currentPhoto.id)} />
-                    <span className="hidden sm:inline">
-                      {currentPhoto && likedPhotos.has(currentPhoto.id) ? 'Liked' : 'Like'}
-                    </span>
+                    <span className="hidden sm:inline">{shareCopied ? 'Copied!' : 'Share'}</span>
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
